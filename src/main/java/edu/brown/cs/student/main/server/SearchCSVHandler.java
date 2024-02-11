@@ -1,2 +1,5 @@
-package edu.brown.cs.student.main.server;public class SearchCSVHandler {
+package edu.brown.cs.student.main.server;
+
+public class SearchCSVHandler {
+
 }
