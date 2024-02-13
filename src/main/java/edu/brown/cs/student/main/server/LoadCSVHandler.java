@@ -1,7 +1,6 @@
 package edu.brown.cs.student.main.server;
 
 import edu.brown.cs.student.main.csv.AccessCSV;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 import spark.Request;
@@ -35,9 +34,9 @@ public class LoadCSVHandler implements Route {
       responseMap.put("result", "success");
       responseMap.put("message", "CSV file %s loaded".formatted(filePath));
       return responseMap;
-    } catch (FileNotFoundException e) {
+    } catch (Exception e) {
       responseMap.put("result", "Exception");
-      responseMap.put("error", "File %s does not exist.".formatted(filePath));
+      responseMap.put("error", e.toString());
       e.printStackTrace();
       return responseMap;
     }
