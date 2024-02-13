@@ -20,11 +20,16 @@ public class LoadCSVHandler implements Route {
     String path = request.queryParams("path");
     Map<String, Object> responseMap = new HashMap<>();
     String hasHeaderString = request.queryParams("hasHeader");
+    if (path == null) {
+      responseMap.put("result", "Exception");
+      responseMap.put("error", "csv file path (path param) is not provided.");
+      return responseMap;
+    }
     if (!hasHeaderString.equals("true") && !hasHeaderString.equals("false")) {
       responseMap.put("result", "Exception");
       responseMap.put(
           "error",
-          "Wrong hasHeader param value: %s.hasHeader param should be true or false. "
+          "Invalid hasHeader param value: %s.hasHeader param should be true or false. "
               .formatted(hasHeaderString));
       return responseMap;
     }

@@ -21,6 +21,11 @@ public class SearchCSVHandler implements Route {
     // TODO: call accessCSV.searchCSV()
     String query = request.queryParams("query");
     Map<String, Object> responseMap = new HashMap<>();
+    if (query == null) {
+      responseMap.put("result", "Exception");
+      responseMap.put("error", "query param is not provided.");
+      return responseMap;
+    }
     try {
       List<List<String>> searchedResult = this.accessCSV.searchCSV(query);
       responseMap.put("result", "success");
