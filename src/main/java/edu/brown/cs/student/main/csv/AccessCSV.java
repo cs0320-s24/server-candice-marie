@@ -32,11 +32,11 @@ public class AccessCSV {
     this.searcher = new Searcher<>(this.parsedResult);
   }
 
-  public void ViewCSV() throws CsvNotLoadedException {
+  public List<List<String>> ViewCSV() throws CsvNotLoadedException {
     if (parser == null) {
       throw new CsvNotLoadedException("Cannot view csv. ");
     }
-    // TODO: print csv as json
+    return parsedResult.getData();
   }
   /**
    * Performs a query search using the specified query string and searcher.

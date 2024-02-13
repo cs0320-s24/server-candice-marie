@@ -30,6 +30,7 @@ public class LoadCSVHandler implements Route {
     }
     boolean hasHeader = hasHeaderString.equals("true");
     try {
+
       accessCSV.LoadCSV(filePath, hasHeader);
       responseMap.put("result", "success");
       responseMap.put("message", "CSV file %s loaded".formatted(filePath));
