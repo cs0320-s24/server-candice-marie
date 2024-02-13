@@ -28,14 +28,6 @@ public class Searcher<T> { // T is the single object element within a row
   }
 
   /**
-   * Retrieves the data rows in the CSV dataset.
-   *
-   * @return The List of Lists representing the data rows.
-   */
-  public List<List<T>> getData() {
-    return data;
-  }
-  /**
    * Searches for the specified element in all columns of the dataset and returns matching rows.
    *
    * @param searchKey The element to search for.
