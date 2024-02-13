@@ -44,7 +44,10 @@ public class AccessCSV {
    * @param queryString The query string.
    * @throws Exception If an error occurs during the query search.
    */
-  public void searchCSV(String queryString) throws Exception {
+  public List<List<String>> searchCSV(String queryString) throws Exception {
+    if (parser == null) {
+      throw new CsvNotLoadedException("Cannot view csv. ");
+    }
     String[] queries = queryString.split("&&");
     Map<Integer, List<String>> searchResults = new HashMap<>();
     List<String> containQueries = new ArrayList<>();
@@ -87,10 +90,9 @@ public class AccessCSV {
         }
       }
     }
-
-    for (List<String> row : searchResults.values()) {
-      System.out.println(row);
-    }
+    List<List<String>> searchResultList = new ArrayList<>();
+    searchResultList.addAll(searchResults.values());
+    return searchResultList;
   }
 
   private static boolean isUnderDataDirectory(String filePath) {

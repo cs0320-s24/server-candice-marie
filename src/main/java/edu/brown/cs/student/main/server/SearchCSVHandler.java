@@ -1,6 +1,9 @@
 package edu.brown.cs.student.main.server;
 
 import edu.brown.cs.student.main.csv.AccessCSV;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -16,7 +19,17 @@ public class SearchCSVHandler implements Route {
   @Override
   public Object handle(Request request, Response response) {
     // TODO: call accessCSV.searchCSV()
-
-    return 0;
+    String query = request.queryParams("query");
+    Map<String, Object> responseMap = new HashMap<>();
+    try {
+      List<List<String>> searchedResult = this.accessCSV.searchCSV(query);
+      responseMap.put("result", "success");
+      responseMap.put("searchedResult", searchedResult);
+    } catch (Exception e) {
+      responseMap.put("result", "Exception");
+      responseMap.put("error", e.toString());
+      e.printStackTrace();
+    }
+    return responseMap;
   }
 }

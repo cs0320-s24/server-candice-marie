@@ -17,7 +17,7 @@ public class LoadCSVHandler implements Route {
 
   @Override
   public Object handle(Request request, Response response) {
-    String filePath = request.queryParams("path");
+    String path = request.queryParams("path");
     Map<String, Object> responseMap = new HashMap<>();
     String hasHeaderString = request.queryParams("hasHeader");
     if (!hasHeaderString.equals("true") && !hasHeaderString.equals("false")) {
@@ -31,9 +31,9 @@ public class LoadCSVHandler implements Route {
     boolean hasHeader = hasHeaderString.equals("true");
     try {
 
-      accessCSV.LoadCSV(filePath, hasHeader);
+      accessCSV.LoadCSV(path, hasHeader);
       responseMap.put("result", "success");
-      responseMap.put("message", "CSV file %s loaded".formatted(filePath));
+      responseMap.put("message", "CSV file %s loaded".formatted(path));
       return responseMap;
     } catch (Exception e) {
       responseMap.put("result", "Exception");
