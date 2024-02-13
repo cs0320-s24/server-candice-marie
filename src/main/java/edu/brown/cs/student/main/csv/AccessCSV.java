@@ -46,7 +46,7 @@ public class AccessCSV {
    */
   public List<List<String>> searchCSV(String queryString) throws Exception {
     if (parser == null) {
-      throw new CsvNotLoadedException("Cannot view csv. ");
+      throw new CsvNotLoadedException("Cannot search csv. ");
     }
     String[] queries = queryString.split("&&");
     Map<Integer, List<String>> searchResults = new HashMap<>();
