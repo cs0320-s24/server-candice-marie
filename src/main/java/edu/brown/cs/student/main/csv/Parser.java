@@ -24,6 +24,7 @@ public class Parser<T> {
 
   static final Pattern regexSplitCSVRow =
       Pattern.compile(",(?=([^\\\"]*\\\"[^\\\"]*\\\")*(?![^\\\"]*\\\"))");
+
   /**
    * Constructs a Parser with the specified Reader, CreatorFromRow, and a flag indicating whether
    * the CSV file has a header.
