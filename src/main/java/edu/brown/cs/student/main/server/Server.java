@@ -2,6 +2,8 @@ package edu.brown.cs.student.main.server;
 
 import static spark.Spark.after;
 
+import edu.brown.cs.student.main.broadband.ACSCensusDataSource;
+import edu.brown.cs.student.main.broadband.exceptions.DataSourceException;
 import edu.brown.cs.student.main.csv.AccessCSV;
 import spark.Spark;
 
@@ -19,6 +21,16 @@ public class Server {
     Spark.get("loadcsv", new LoadCSVHandler(accessCSV));
     Spark.get("searchcsv", new SearchCSVHandler(accessCSV));
     Spark.get("viewcsv", new ViewCSVHandler(accessCSV));
+    ACSCensusDataSource source = new ACSCensusDataSource();
+    try {
+      source.getStateCode();
+      source.getCountyCode("06");
+    } catch(DataSourceException e) {
+      e.printStackTrace();
+    }
+
+    Spark.get("broadband", new BroadbandHandler(new ACSCensusDataSource()));
+
     Spark.init();
     Spark.awaitInitialization();
 
