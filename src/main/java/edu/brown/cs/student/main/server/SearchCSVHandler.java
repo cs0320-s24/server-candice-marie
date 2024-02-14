@@ -15,7 +15,7 @@ import spark.Route;
 public class SearchCSVHandler implements Route {
 
   private final AccessCSV accessCSV;
-  private final JsonAdapter<Map<String,Object>> adapter;
+  private final JsonAdapter<Map<String, Object>> adapter;
 
   public SearchCSVHandler(AccessCSV accessCSV) {
     this.accessCSV = accessCSV;
