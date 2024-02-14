@@ -24,10 +24,26 @@
   public Object handle(Request request, Response response) {
     Set<String> parameters = request.queryParams();
     System.out.println("params=" + parameters);
+    Map<String, Object> responsemap = new HashMap<>();
     String countyname = request.queryParams("County");
     String statename = request.queryParams("State");
+    if (countyname == null & statename ==null) {
+      responsemap.put("result", "Exception");
+      responsemap.put("error", "county name and state name not provided");
+      return responsemap;
+    }
+    if (countyname == null) {
+      responsemap.put("result", "Exception");
+      responsemap.put("error", "county name not provided");
+      return responsemap;
+    }
+    if (statename == null) {
+      responsemap.put("result", "Exception");
+      responsemap.put("error", "state name not provided");
+      return responsemap;
+    }
     System.out.println("state=" + parameters);
-    Map<String, Object> responsemap = new HashMap<>();
+
     try {
       String broadbandpercentage = state.getBroadbandPercentage(countyname, statename);
       responsemap.put("result", "success");
