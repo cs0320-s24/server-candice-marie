@@ -11,14 +11,11 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.sql.Time;
-import java.time.LocalDateTime;
+import java.util.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import okio.Buffer;
-import java.util.*;
-import java.time.LocalDate;
 
 public class ACSCensusDataSource implements CensusDataSource {
 
@@ -39,7 +36,7 @@ public class ACSCensusDataSource implements CensusDataSource {
       Moshi moshi = new Moshi.Builder().build();
       Type listStringObject = Types.newParameterizedType(List.class, List.class, String.class);
       JsonAdapter<List<List<String>>> adapter = moshi.adapter(listStringObject);
-      //Store Statename, Statecode as a list of list of strings (how it is represented in the API)
+      // Store Statename, Statecode as a list of list of strings (how it is represented in the API)
       List<List<String>> body =
           adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
       clientConnection.disconnect();
@@ -54,6 +51,14 @@ public class ACSCensusDataSource implements CensusDataSource {
     } catch (IOException e) {
       throw new DataSourceException(e.getMessage());
     }
+  }
+
+  public Map<String, String> getStatecode_map() {
+    return Collections.unmodifiableMap(statecode_map);
+  }
+
+  public Map<String, String> getCountycode_map() {
+    return Collections.unmodifiableMap(countycode_map);
   }
 
   private static HttpURLConnection connect(URL requestURL) throws DataSourceException, IOException {
@@ -75,13 +80,16 @@ public class ACSCensusDataSource implements CensusDataSource {
     try {
       System.out.println("trying to get county code");
       URL requestURL =
-          //https://api.census.gov/data/2010/dec/sf1?get=NAME&for=county:*&in=state:*
-          new URL("https", "api.census.gov", "/data/2010/dec/sf1?get=NAME&for=county:*&in=state:" + statecode);
+          // https://api.census.gov/data/2010/dec/sf1?get=NAME&for=county:*&in=state:*
+          new URL(
+              "https",
+              "api.census.gov",
+              "/data/2010/dec/sf1?get=NAME&for=county:*&in=state:" + statecode);
       HttpURLConnection clientConnection = connect(requestURL);
       Moshi moshi = new Moshi.Builder().build();
       Type listStringObject = Types.newParameterizedType(List.class, List.class, String.class);
       JsonAdapter<List<List<String>>> adapter = moshi.adapter(listStringObject);
-      //Store Statename, Statecode as a list of list of strings (how it is represented in the API)
+      // Store Statename, Statecode as a list of list of strings (how it is represented in the API)
       List<List<String>> body =
           adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
       clientConnection.disconnect();
@@ -97,12 +105,14 @@ public class ACSCensusDataSource implements CensusDataSource {
       throw new DataSourceException(e.getMessage());
     }
   }
-  public String getBroadbandPercentage(String countyname, String statename) throws InputNotFoundException, DataSourceException, DataNotFoundException {
+
+  public String getBroadbandPercentage(String countyname, String statename)
+      throws InputNotFoundException, DataSourceException, DataNotFoundException {
     System.out.println(statename);
     System.out.println(statecode_map);
     System.out.println(countyname);
     System.out.println("county code:" + countycode_map);
-    //https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:*&in=state:06
+    // https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:*&in=state:06
     if (!statecode_map.containsKey(statename)) {
       throw new InputNotFoundException("The state you entered (" + statename);
     }
@@ -119,13 +129,19 @@ public class ACSCensusDataSource implements CensusDataSource {
 
     try {
       URL requestURL =
-          new URL("https", "api.census.gov", "/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:" + county_code +"&in=state:" + state_code);
+          new URL(
+              "https",
+              "api.census.gov",
+              "/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:"
+                  + county_code
+                  + "&in=state:"
+                  + state_code);
       System.out.println("URL=" + requestURL);
       HttpURLConnection clientConnection = connect(requestURL);
       Moshi moshi = new Moshi.Builder().build();
       Type listStringObject = Types.newParameterizedType(List.class, List.class, String.class);
       JsonAdapter<List<List<String>>> adapter = moshi.adapter(listStringObject);
-      //Store Statename, Statecode as a list of list of strings (how it is represented in the API)
+      // Store Statename, Statecode as a list of list of strings (how it is represented in the API)
       List<List<String>> body =
           adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
       clientConnection.disconnect();

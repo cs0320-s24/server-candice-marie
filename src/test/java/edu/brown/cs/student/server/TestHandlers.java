@@ -24,109 +24,119 @@ import org.junit.jupiter.api.Test;
 import spark.Spark;
 
 public class TestHandlers {
-    private final JsonAdapter<Map<String,Object>> adapter;
+  private final JsonAdapter<Map<String, Object>> adapter;
 
-    public TestHandlers() {
-        Moshi moshi = new Moshi.Builder().build();
-        Type type = Types.newParameterizedType(Map.class, String.class, Object.class);
-        adapter = moshi.adapter(type);
-    }
-    @BeforeAll
-    public static void setup_before_everything() {
-        Spark.port(0);
-        Logger.getLogger("").setLevel(Level.WARNING); // empty name = root logger
+  public TestHandlers() {
+    Moshi moshi = new Moshi.Builder().build();
+    Type type = Types.newParameterizedType(Map.class, String.class, Object.class);
+    adapter = moshi.adapter(type);
+  }
 
-    }
+  @BeforeAll
+  public static void setup_before_everything() {
+    Spark.port(0);
+    Logger.getLogger("").setLevel(Level.WARNING); // empty name = root logger
+  }
 
-    @BeforeEach
-    public void setup() {
-        // Re-initialize state, etc. for _every_ test method run
-        AccessCSV accessCSV = new AccessCSV();
-        // In fact, restart the entire Spark server for every test!
-        Spark.get("loadcsv", new LoadCSVHandler(accessCSV));
-        Spark.get("searchcsv", new SearchCSVHandler(accessCSV));
-        Spark.get("viewcsv", new ViewCSVHandler(accessCSV));
-        Spark.init();
-        Spark.awaitInitialization(); // don't continue until the server is listening
-    }
+  @BeforeEach
+  public void setup() {
+    // Re-initialize state, etc. for _every_ test method run
+    AccessCSV accessCSV = new AccessCSV();
+    // In fact, restart the entire Spark server for every test!
+    Spark.get("loadcsv", new LoadCSVHandler(accessCSV));
+    Spark.get("searchcsv", new SearchCSVHandler(accessCSV));
+    Spark.get("viewcsv", new ViewCSVHandler(accessCSV));
+    Spark.init();
+    Spark.awaitInitialization(); // don't continue until the server is listening
+  }
 
-    @AfterEach
-    public void teardown() {
-        // Gracefully stop Spark listening on both endpoints after each test
-        Spark.unmap("loadcsv");
-        Spark.unmap("searchcsv");
-        Spark.unmap("viewcsv");
-        Spark.awaitStop(); // don't proceed until the server is stopped
-    }
+  @AfterEach
+  public void teardown() {
+    // Gracefully stop Spark listening on both endpoints after each test
+    Spark.unmap("loadcsv");
+    Spark.unmap("searchcsv");
+    Spark.unmap("viewcsv");
+    Spark.awaitStop(); // don't proceed until the server is stopped
+  }
 
-    private static HttpURLConnection tryRequest(String apiCall) throws IOException {
-        URL requestURL = new URL("http://localhost:" + Spark.port() + "/" + apiCall);
-        HttpURLConnection clientConnection = (HttpURLConnection) requestURL.openConnection();
+  private static HttpURLConnection tryRequest(String apiCall) throws IOException {
+    URL requestURL = new URL("http://localhost:" + Spark.port() + "/" + apiCall);
+    HttpURLConnection clientConnection = (HttpURLConnection) requestURL.openConnection();
 
-        clientConnection.setRequestMethod("GET");
+    clientConnection.setRequestMethod("GET");
 
-        clientConnection.connect();
-        return clientConnection;
-    }
+    clientConnection.connect();
+    return clientConnection;
+  }
 
+  @Test
+  public void testLoadCSVSuccess() throws IOException {
+    HttpURLConnection clientConnection =
+        tryRequest("loadcsv?path=data/census/income_by_race.csv&hasHeader=true");
+    assertEquals(200, clientConnection.getResponseCode());
+    Map<String, Object> response =
+        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+    assertEquals("success", response.get("result"));
+  }
 
-    @Test
-    public void testLoadCSVSuccess() throws IOException {
-        HttpURLConnection clientConnection = tryRequest("loadcsv?path=data/census/income_by_race.csv&hasHeader=true");
-        assertEquals(200, clientConnection.getResponseCode());
-        Map<String,Object> response = adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-        assertEquals("success",response.get("result"));
-    }
+  @Test
+  public void testLoadCSVInvalidPath() throws IOException {
+    HttpURLConnection clientConnection = tryRequest("loadcsv?path=data/xxx.csv&hasHeader=true");
+    assertEquals(200, clientConnection.getResponseCode());
+    Map<String, Object> response =
+        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+    assertEquals("Exception", response.get("result"));
+  }
 
-    @Test public void testLoadCSVInvalidPath() throws IOException {
-        HttpURLConnection clientConnection = tryRequest("loadcsv?path=data/xxx.csv&hasHeader=true");
-        assertEquals(200, clientConnection.getResponseCode());
-        Map<String,Object> response = adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-        assertEquals("Exception",response.get("result"));
-    }
+  @Test
+  public void testLoadCSVInvalidHasHeader() throws IOException {
+    HttpURLConnection clientConnection =
+        tryRequest("loadcsv?path=data/census/income_by_race.csv&hasHeader=xx");
+    assertEquals(200, clientConnection.getResponseCode());
+    Map<String, Object> response =
+        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+    assertEquals("Exception", response.get("result"));
+  }
 
-    @Test public void testLoadCSVInvalidHasHeader() throws IOException {
-        HttpURLConnection clientConnection = tryRequest("loadcsv?path=data/census/income_by_race.csv&hasHeader=xx");
-        assertEquals(200, clientConnection.getResponseCode());
-        Map<String,Object> response = adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-        assertEquals("Exception",response.get("result"));
-    }
+  @Test
+  public void testViewCSVHandlerSuccess() throws IOException {
+    HttpURLConnection clientConnection1 =
+        tryRequest("loadcsv?path=data/census/income_by_race.csv&hasHeader=true");
+    assertEquals(200, clientConnection1.getResponseCode());
+    HttpURLConnection clientConnection = tryRequest("viewcsv");
+    assertEquals(200, clientConnection.getResponseCode());
+    Map<String, Object> response =
+        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+    assertEquals("success", response.get("result"));
+  }
 
-    @Test
-    public void testViewCSVHandlerSuccess() throws IOException {
-        HttpURLConnection clientConnection1 = tryRequest("loadcsv?path=data/census/income_by_race.csv&hasHeader=true");
-        assertEquals(200, clientConnection1.getResponseCode());
-        HttpURLConnection clientConnection = tryRequest("viewcsv");
-        assertEquals(200, clientConnection.getResponseCode());
-        Map<String,Object> response = adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-        assertEquals("success",response.get("result"));
-    }
+  @Test
+  public void testViewCSVHandlerFailure() throws IOException {
+    HttpURLConnection clientConnection = tryRequest("viewcsv");
+    assertEquals(200, clientConnection.getResponseCode());
+    Map<String, Object> response =
+        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+    assertEquals("Exception", response.get("result"));
+  }
 
-    @Test
-    public void testViewCSVHandlerFailure() throws IOException {
-        HttpURLConnection clientConnection = tryRequest("viewcsv");
-        assertEquals(200, clientConnection.getResponseCode());
-        Map<String,Object> response = adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-        assertEquals("Exception",response.get("result"));
-    }
+  @Test
+  public void testSearchCSVHandlerSuccess() throws IOException {
+    HttpURLConnection clientConnection1 =
+        tryRequest("loadcsv?path=data/census/income_by_race.csv&hasHeader=true");
+    assertEquals(200, clientConnection1.getResponseCode());
+    HttpURLConnection clientConnection = tryRequest("searchcsv?query=Race,White|Black");
+    assertEquals(200, clientConnection.getResponseCode());
+    Map<String, Object> response =
+        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+    assertEquals("success", response.get("result"));
+  }
 
-    @Test
-    public void testSearchCSVHandlerSuccess() throws IOException {
-        HttpURLConnection clientConnection1 = tryRequest("loadcsv?path=data/census/income_by_race.csv&hasHeader=true");
-        assertEquals(200, clientConnection1.getResponseCode());
-        HttpURLConnection clientConnection = tryRequest("searchcsv?query=Race,White|Black");
-        assertEquals(200, clientConnection.getResponseCode());
-        Map<String,Object> response = adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-        assertEquals("success",response.get("result"));
-    }
-
-    @Test
-    public void testSearchCSVHandlerFailure() throws IOException {
-        HttpURLConnection clientConnection = tryRequest("searchcsv?query=Race,White|Black");
-        assertEquals(200, clientConnection.getResponseCode());
-        Map<String,Object> response = adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-        assertEquals("Exception",response.get("result"));
-    }
-
-
+  @Test
+  public void testSearchCSVHandlerFailure() throws IOException {
+    HttpURLConnection clientConnection = tryRequest("searchcsv?query=Race,White|Black");
+    assertEquals(200, clientConnection.getResponseCode());
+    Map<String, Object> response =
+        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+    assertEquals("Exception", response.get("result"));
+  }
 }
