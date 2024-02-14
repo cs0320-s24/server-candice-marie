@@ -31,6 +31,12 @@ public class LoadCSVHandler implements Route {
     String path = request.queryParams("path");
     Map<String, Object> responseMap = new HashMap<>();
     String hasHeaderString = request.queryParams("hasHeader");
+    if (path==null&&hasHeaderString==null) {
+      responseMap.put("result", "Exception");
+      responseMap.put("error", "csv file path (path param) and hasHeader are not provided.");
+      String responseMapString = adapter.toJson(responseMap);
+      return responseMapString;
+    }
     if (path == null) {
       responseMap.put("result", "Exception");
       responseMap.put("error", "csv file path (path param) is not provided.");
