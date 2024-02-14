@@ -23,6 +23,7 @@ public class Server {
     ACSCensusDataSource source = new ACSCensusDataSource();
     try {
       source.getStateCode();
+      source.getACSVariables();
     } catch (Exception e) {
       e.printStackTrace();
     }

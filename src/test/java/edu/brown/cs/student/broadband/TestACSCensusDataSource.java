@@ -52,6 +52,7 @@ public class TestACSCensusDataSource {
   @Test
   public void testGetBroadBandPercentage() throws DataNotFoundException, DataSourceException {
     dataSource.getStateCode();
+    dataSource.getACSVariables();
     assertNotNull(dataSource.getBroadbandPercentage("Elmore County", "Alabama"));
     assertThrows(
         DataNotFoundException.class,
@@ -62,5 +63,9 @@ public class TestACSCensusDataSource {
     assertThrows(
         InputNotFoundException.class,
         () -> dataSource.getBroadbandPercentage("Autauga xxx", "Alabama"));
+
+    assertThrows(
+        DataNotFoundException.class,
+        () -> dataSource.getBroadbandPercentage("Elmore County", "Alabama", "xxxx"));
   }
 }

@@ -27,6 +27,7 @@ public class ACSCensusDataSource implements CensusDataSource {
   public ACSCensusDataSource() {
     statecode_map = new HashMap<>();
     countycode_map = new HashMap<>();
+    acsVariables = new HashSet<>();
   }
 
   public void getStateCode() throws DataSourceException {
@@ -108,20 +109,35 @@ public class ACSCensusDataSource implements CensusDataSource {
     }
   }
 
-  public void getACSVariables() {
-
+  public void getACSVariables() throws DataSourceException {
+    try {
+      URL requestURL = new URL("https", "api.census.gov", "/data/2021/acs/acs1/profile/variables");
+      HttpURLConnection clientConnection = connect(requestURL);
+      Moshi moshi = new Moshi.Builder().build();
+      Type listStringObject = Types.newParameterizedType(List.class, List.class, String.class);
+      JsonAdapter<List<List<String>>> adapter = moshi.adapter(listStringObject);
+      // Store Statename, Statecode as a list of list of strings (how it is represented in the API)
+      List<List<String>> body =
+          adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+      clientConnection.disconnect();
+      if (body == null) {
+        throw new DataSourceException("malformed response from ACS");
+      }
+      // body = List<List<String>> that stores the statename, statecode
+      // change List<List<String>> to HashMap to store data
+      for (List<String> i : body) {
+        acsVariables.add(i.get(0));
+      }
+    } catch (Exception e) {
+      throw new DataSourceException(e.getMessage());
+    }
   }
-  public String getBroadbandPercentage(String countyname, String statename, String acsVariable) {
-    return '';
-  }
 
-  public String getBroadbandPercentage(String countyname, String statename)
+  public String getBroadbandPercentage(String countyname, String statename, String acsVariable)
       throws InputNotFoundException, DataSourceException, DataNotFoundException {
-    System.out.println(statename);
-    System.out.println(statecode_map);
-    System.out.println(countyname);
-    System.out.println("county code:" + countycode_map);
-    // https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:*&in=state:06
+    if (!acsVariable.contains(acsVariable)) {
+      throw new InputNotFoundException("The acs variable you entered (" + statename);
+    }
     if (!statecode_map.containsKey(statename)) {
       throw new InputNotFoundException("The state you entered (" + statename);
     }
@@ -133,15 +149,12 @@ public class ACSCensusDataSource implements CensusDataSource {
     }
     String county_code = countycode_map.get(countyname);
 
-    System.out.println(state_code);
-    System.out.println(county_code);
-
     try {
       URL requestURL =
           new URL(
               "https",
               "api.census.gov",
-              "/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:"
+              "/data/2021/acs/acs1/subject/variables?get=NAME,%s&for=county:".formatted(acsVariable)
                   + county_code
                   + "&in=state:"
                   + state_code);
@@ -158,14 +171,17 @@ public class ACSCensusDataSource implements CensusDataSource {
         throw new DataSourceException("malformed response from ACS");
       }
       String broadband_percentage = body.get(1).get(1);
-      System.out.println(body);
-      System.out.println(broadband_percentage);
       return broadband_percentage;
 
     } catch (IOException e) {
       throw new DataSourceException(e.getMessage());
     } catch (DataSourceException e) {
-      throw new DataNotFoundException(countyname, statename);
+      throw new DataNotFoundException(countyname, statename, acsVariable);
     }
+  }
+
+  public String getBroadbandPercentage(String countyname, String statename)
+      throws InputNotFoundException, DataSourceException, DataNotFoundException {
+    return getBroadbandPercentage(countyname, statename, "S2802_C03_022E");
   }
 }
