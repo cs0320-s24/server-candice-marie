@@ -22,6 +22,8 @@ public class ACSCensusDataSource implements CensusDataSource {
   private Map<String, String> statecode_map;
   private Map<String, String> countycode_map;
 
+  private Set<String> acsVariables;
+
   public ACSCensusDataSource() {
     statecode_map = new HashMap<>();
     countycode_map = new HashMap<>();
@@ -104,6 +106,13 @@ public class ACSCensusDataSource implements CensusDataSource {
     } catch (IOException e) {
       throw new DataSourceException(e.getMessage());
     }
+  }
+
+  public void getACSVariables() {
+
+  }
+  public String getBroadbandPercentage(String countyname, String statename, String acsVariable) {
+    return '';
   }
 
   public String getBroadbandPercentage(String countyname, String statename)
