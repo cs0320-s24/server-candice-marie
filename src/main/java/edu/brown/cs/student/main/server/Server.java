@@ -4,7 +4,9 @@ import static spark.Spark.after;
 
 import edu.brown.cs.student.main.broadband.ACSCensusDataSource;
 import edu.brown.cs.student.main.broadband.exceptions.DataSourceException;
+import edu.brown.cs.student.main.broadband.exceptions.InputNotFoundException;
 import edu.brown.cs.student.main.csv.AccessCSV;
+import javax.xml.crypto.Data;
 import spark.Spark;
 
 public class Server {
@@ -26,6 +28,11 @@ public class Server {
       source.getStateCode();
       source.getCountyCode("06");
     } catch(DataSourceException e) {
+      e.printStackTrace();
+    }
+    try {
+      source.getBroadbandPercentage("Stone County", "Arkansas");
+    } catch(DataSourceException | InputNotFoundException e) {
       e.printStackTrace();
     }
 
