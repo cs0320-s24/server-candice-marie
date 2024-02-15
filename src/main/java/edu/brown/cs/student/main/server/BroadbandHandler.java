@@ -1,7 +1,10 @@
 package edu.brown.cs.student.main.server;
 
-import edu.brown.cs.student.main.broadband.ACSCensusDataSource;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
+import com.squareup.moshi.Types;
 import edu.brown.cs.student.main.broadband.CensusDataSource;
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,12 +15,16 @@ import spark.Route;
 
 public class BroadbandHandler implements Route {
 
- // private final ACSCensusDataSource state;
- private final CensusDataSource state;
+  // private final ACSCensusDataSource state;
+  private final CensusDataSource state;
+  private final JsonAdapter<Map<String, Object>> adapter;
 
- // public BroadbandHandler(ACSCensusDataSource state) {
- public BroadbandHandler(CensusDataSource state) {
+  // public BroadbandHandler(ACSCensusDataSource state) {
+  public BroadbandHandler(CensusDataSource state) {
     this.state = state;
+    Type type = Types.newParameterizedType(Map.class, String.class, Object.class);
+    Moshi moshi = new Moshi.Builder().build();
+    adapter = moshi.adapter(type);
   }
 
   @Override
@@ -27,20 +34,25 @@ public class BroadbandHandler implements Route {
     Map<String, Object> responsemap = new HashMap<>();
     String countyname = request.queryParams("County");
     String statename = request.queryParams("State");
+    System.out.println(countyname);
+    System.out.println(statename);
     if (countyname == null & statename == null) {
       responsemap.put("result", "Exception");
       responsemap.put("error", "county name and state name not provided");
-      return responsemap;
+      String responseMapString = adapter.toJson(responsemap);
+      return responseMapString;
     }
     if (countyname == null) {
       responsemap.put("result", "Exception");
       responsemap.put("error", "county name not provided");
-      return responsemap;
+      String responseMapString = adapter.toJson(responsemap);
+      return responseMapString;
     }
     if (statename == null) {
       responsemap.put("result", "Exception");
       responsemap.put("error", "state name not provided");
-      return responsemap;
+      String responseMapString = adapter.toJson(responsemap);
+      return responseMapString;
     }
     System.out.println("state=" + parameters);
 
@@ -53,11 +65,12 @@ public class BroadbandHandler implements Route {
       String localdatetime = LocalDateTime.now().toString();
       responsemap.put("date and time", localdatetime);
     } catch (Exception e) {
-      responsemap.put("result", "exception");
+      responsemap.put("result", "Exception");
       responsemap.put("error", e.toString());
       e.printStackTrace();
     }
-    return responsemap;
+    String responseMapString = adapter.toJson(responsemap);
+    return responseMapString;
     // .getBroadband(countyname, statename);
   }
 }
