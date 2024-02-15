@@ -35,9 +35,7 @@ public class BroadbandHandler implements Route {
     String countyname = request.queryParams("County");
     String statename = request.queryParams("State");
 
-
     String variablename = request.queryParams("ACSVariable");
-
 
     System.out.println(countyname);
     System.out.println(statename);
@@ -79,7 +77,8 @@ public class BroadbandHandler implements Route {
       return responseMapString;
     } else {
       try {
-        String broadbandpercentage = state.getBroadbandPercentage(countyname, statename, variablename);
+        String broadbandpercentage =
+            state.getBroadbandPercentage(countyname, statename, variablename);
         responsemap.put("result", "success");
         responsemap.put("broadbandpercentage", broadbandpercentage);
         responsemap.put("county name", countyname);
@@ -94,7 +93,6 @@ public class BroadbandHandler implements Route {
       String responseMapString = adapter.toJson(responsemap);
       return responseMapString;
     }
-
 
     // .getBroadband(countyname, statename);
   }

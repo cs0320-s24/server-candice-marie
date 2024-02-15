@@ -6,8 +6,6 @@ import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
 import edu.brown.cs.student.broadband.MockDataSource;
-import edu.brown.cs.student.main.broadband.ACSCensusDataSource;
-import edu.brown.cs.student.main.broadband.CachedACSDataSource;
 import edu.brown.cs.student.main.broadband.CensusDataSource;
 import edu.brown.cs.student.main.csv.AccessCSV;
 import edu.brown.cs.student.main.server.BroadbandHandler;
@@ -52,15 +50,15 @@ public class TestHandlers {
     Spark.get("searchcsv", new SearchCSVHandler(accessCSV));
     Spark.get("viewcsv", new ViewCSVHandler(accessCSV));
     CensusDataSource mockedsource = new MockDataSource();
-//    ACSCensusDataSource source = new ACSCensusDataSource();
-//    try {
-//      source.getStateCode();
-//      source.getACSVariables();
-//    } catch (Exception e) {
-//      e.printStackTrace();
-//    }
+    //    ACSCensusDataSource source = new ACSCensusDataSource();
+    //    try {
+    //      source.getStateCode();
+    //      source.getACSVariables();
+    //    } catch (Exception e) {
+    //      e.printStackTrace();
+    //    }
 
-    //CachedACSDataSource cached_source = new CachedACSDataSource(source);
+    // CachedACSDataSource cached_source = new CachedACSDataSource(source);
     Spark.get("broadband", new BroadbandHandler(mockedsource));
     Spark.init();
     Spark.awaitInitialization(); // don't continue until the server is listening
@@ -172,28 +170,29 @@ public class TestHandlers {
 
   @Test
   public void testBroadbandHandlerFailure() throws IOException {
-//    //county name is invalid
-//    HttpURLConnection clientConnection = tryRequest("broadband?County=KernCounty&State=California");
-//    assertEquals(200, clientConnection.getResponseCode());
-//    //state name is invalid
-//    HttpURLConnection clientConnection1 = tryRequest("broadband?County=Kern+County&State=Orange");
-//    assertEquals(200, clientConnection1.getResponseCode());
-//    //data is not in dataset (but county, state exist)
-//    HttpURLConnection clientConnection2 = tryRequest("broadband?County=Stone+County&State=Arkansas");
-//    assertEquals(200, clientConnection2.getResponseCode());
-    //no user input variables
+    //    //county name is invalid
+    //    HttpURLConnection clientConnection =
+    // tryRequest("broadband?County=KernCounty&State=California");
+    //    assertEquals(200, clientConnection.getResponseCode());
+    //    //state name is invalid
+    //    HttpURLConnection clientConnection1 =
+    // tryRequest("broadband?County=Kern+County&State=Orange");
+    //    assertEquals(200, clientConnection1.getResponseCode());
+    //    //data is not in dataset (but county, state exist)
+    //    HttpURLConnection clientConnection2 =
+    // tryRequest("broadband?County=Stone+County&State=Arkansas");
+    //    assertEquals(200, clientConnection2.getResponseCode());
+    // no user input variables
     HttpURLConnection clientConnection = tryRequest("broadband");
     assertEquals(200, clientConnection.getResponseCode());
-    //no county param
+    // no county param
     HttpURLConnection clientConnection4 = tryRequest("broadband?State=California");
     assertEquals(200, clientConnection4.getResponseCode());
-    //no state param
+    // no state param
     HttpURLConnection clientConnection5 = tryRequest("broadband?County=Kern+County");
     assertEquals(200, clientConnection5.getResponseCode());
     Map<String, Object> response =
         adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
     assertEquals("Exception", response.get("result"));
   }
-
-
 }

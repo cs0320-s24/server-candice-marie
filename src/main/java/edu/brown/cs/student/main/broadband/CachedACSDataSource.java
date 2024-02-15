@@ -4,7 +4,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import edu.brown.cs.student.main.broadband.exceptions.InputNotFoundException;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class CachedACSDataSource implements CensusDataSource {
@@ -45,7 +44,8 @@ public class CachedACSDataSource implements CensusDataSource {
                         // return wrappedACSCensusDataSource.getBroadbandPercentage(countyname,
                         // statename);
                         String out =
-                            wrappedACSCensusDataSource.getBroadbandPercentage(countyname, statename);
+                            wrappedACSCensusDataSource.getBroadbandPercentage(
+                                countyname, statename);
                         return out;
                       } catch (Exception e) {
                         throw new InputNotFoundException(
@@ -58,15 +58,20 @@ public class CachedACSDataSource implements CensusDataSource {
                       String acsvariable = split_params[2];
                       try {
                         String out =
-                            wrappedACSCensusDataSource.getBroadbandPercentage(countyname, statename, acsvariable);
+                            wrappedACSCensusDataSource.getBroadbandPercentage(
+                                countyname, statename, acsvariable);
                         return out;
                       } catch (Exception e) {
                         throw new InputNotFoundException(
-                            "The input you entered (" + countyname + ", " + statename + ", " + acsvariable);
+                            "The input you entered ("
+                                + countyname
+                                + ", "
+                                + statename
+                                + ", "
+                                + acsvariable);
                         // return "";//TODO: may need error handling?
                       }
                     }
-
                   }
                 });
   }

@@ -111,7 +111,8 @@ public class ACSCensusDataSource implements CensusDataSource {
 
   public void getACSVariables() throws DataSourceException {
     try {
-      //URL requestURL = new URL("https", "api.census.gov", "/data/2021/acs/acs1/profile/variables");
+      // URL requestURL = new URL("https", "api.census.gov",
+      // "/data/2021/acs/acs1/profile/variables");
       URL requestURL = new URL("https", "api.census.gov", "/data/2021/acs/acs1/subject/variables");
       HttpURLConnection clientConnection = connect(requestURL);
       Moshi moshi = new Moshi.Builder().build();
@@ -172,6 +173,7 @@ public class ACSCensusDataSource implements CensusDataSource {
         throw new DataSourceException("malformed response from ACS");
       }
       String broadband_percentage = body.get(1).get(1);
+      if (broadband_percentage == null) return "null";
       return broadband_percentage;
 
     } catch (IOException e) {
