@@ -3,6 +3,7 @@ package edu.brown.cs.student.main.server;
 import static spark.Spark.after;
 
 import edu.brown.cs.student.main.broadband.ACSCensusDataSource;
+import edu.brown.cs.student.main.broadband.CachedACSDataSource;
 import edu.brown.cs.student.main.csv.AccessCSV;
 import spark.Spark;
 
@@ -27,7 +28,8 @@ public class Server {
     } catch (Exception e) {
       e.printStackTrace();
     }
-
+    CachedACSDataSource cached_source = new CachedACSDataSource(source);
+    //    CachedACSDataSource cached_source = new CachedACSDataSource(new ACSCensusDataSource());
     //    try {
     //      source.getStateCode();
     //      source.getCountyCode("06");
@@ -40,7 +42,7 @@ public class Server {
     //      e.printStackTrace();
     //    }
 
-    Spark.get("broadband", new BroadbandHandler(source));
+    Spark.get("broadband", new BroadbandHandler(cached_source));
 
     Spark.init();
     Spark.awaitInitialization();
