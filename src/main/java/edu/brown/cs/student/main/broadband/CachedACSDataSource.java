@@ -45,7 +45,7 @@ public class CachedACSDataSource implements CensusDataSource {
   }
 
   @Override
-  public String getBroadbandPercentage(String countyname, String statename) throws Exception {
+  public String getBroadbandPercentage(String countyname, String statename){
     //String public_broadband = Collections.unmodifiable
       String target = countyname+","+statename;
       String result = cache.getUnchecked(target);
