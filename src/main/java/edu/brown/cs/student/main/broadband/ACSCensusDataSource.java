@@ -116,7 +116,6 @@ public class ACSCensusDataSource implements CensusDataSource {
       Moshi moshi = new Moshi.Builder().build();
       Type listStringObject = Types.newParameterizedType(List.class, List.class, String.class);
       JsonAdapter<List<List<String>>> adapter = moshi.adapter(listStringObject);
-      // Store Statename, Statecode as a list of list of strings (how it is represented in the API)
       List<List<String>> body =
           adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
       clientConnection.disconnect();
@@ -128,6 +127,7 @@ public class ACSCensusDataSource implements CensusDataSource {
       for (List<String> i : body) {
         acsVariables.add(i.get(0));
       }
+      System.out.println("ACS VARS=" + acsVariables);
     } catch (Exception e) {
       throw new DataSourceException(e.getMessage());
     }
@@ -136,7 +136,7 @@ public class ACSCensusDataSource implements CensusDataSource {
   public String getBroadbandPercentage(String countyname, String statename, String acsVariable)
       throws InputNotFoundException, DataSourceException, DataNotFoundException {
     if (!acsVariable.contains(acsVariable)) {
-      throw new InputNotFoundException("The acs variable you entered (" + statename);
+      throw new InputNotFoundException("The acs variable you entered (" + acsVariable);
     }
     if (!statecode_map.containsKey(statename)) {
       throw new InputNotFoundException("The state you entered (" + statename);

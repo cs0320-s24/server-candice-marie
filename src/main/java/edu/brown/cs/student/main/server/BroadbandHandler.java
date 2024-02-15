@@ -1,6 +1,7 @@
 package edu.brown.cs.student.main.server;
 
 import edu.brown.cs.student.main.broadband.ACSCensusDataSource;
+import edu.brown.cs.student.main.broadband.CensusDataSource;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,9 +12,11 @@ import spark.Route;
 
 public class BroadbandHandler implements Route {
 
-  private final ACSCensusDataSource state;
+ // private final ACSCensusDataSource state;
+ private final CensusDataSource state;
 
-  public BroadbandHandler(ACSCensusDataSource state) {
+ // public BroadbandHandler(ACSCensusDataSource state) {
+ public BroadbandHandler(CensusDataSource state) {
     this.state = state;
   }
 

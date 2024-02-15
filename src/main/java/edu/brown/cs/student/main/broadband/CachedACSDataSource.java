@@ -1,5 +1,9 @@
 package edu.brown.cs.student.main.broadband;
 
+import edu.brown.cs.student.main.broadband.exceptions.InputNotFoundException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.cache.CacheBuilder;
@@ -15,11 +19,16 @@ public class CachedACSDataSource implements CensusDataSource {
     this.wrappedACSCensusDataSource = toWrap;
 
     this.cache = CacheBuilder.newBuilder()
+        //Using the expireAfterWrite and maximumSize methods to configure the cache,
+        //and documenting how the developer is able to change these parameters is sufficient
+        //to fulfill this spec
+
         // How many entries maximum in the cache?
         .maximumSize(10)
         // How long should entries remain in the cache?
         .expireAfterWrite(1, TimeUnit.MINUTES)
         // Keep statistical info around for profiling purposes
+
         .recordStats()
         .build(
             // Strategy pattern: how should the cache behave when
@@ -31,11 +40,14 @@ public class CachedACSDataSource implements CensusDataSource {
                 // If this isn't yet present in the cache, load it:
                   String countyname = key.split(",")[0];
                   String statename = key.split(",")[1];
-
+//                  Map<String,String> =Collections.unmodifiableMap()
                   try {
-                      return wrappedACSCensusDataSource.getBroadbandPercentage(countyname, statename);
+                     // return wrappedACSCensusDataSource.getBroadbandPercentage(countyname, statename);
+                    String out = wrappedACSCensusDataSource.getBroadbandPercentage(countyname, statename);
+                    return out;
                   } catch (Exception e) {
-                      return "";//TODO: may need error handling?
+                      throw new InputNotFoundException("The input you entered (" + countyname + ", " + statename);
+                      //return "";//TODO: may need error handling?
                   }
 
               }
