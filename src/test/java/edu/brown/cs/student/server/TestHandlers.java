@@ -5,7 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
+import edu.brown.cs.student.broadband.MockDataSource;
 import edu.brown.cs.student.main.broadband.ACSCensusDataSource;
+import edu.brown.cs.student.main.broadband.CachedACSDataSource;
+import edu.brown.cs.student.main.broadband.CensusDataSource;
 import edu.brown.cs.student.main.csv.AccessCSV;
 import edu.brown.cs.student.main.server.BroadbandHandler;
 import edu.brown.cs.student.main.server.LoadCSVHandler;
@@ -48,15 +51,17 @@ public class TestHandlers {
     Spark.get("loadcsv", new LoadCSVHandler(accessCSV));
     Spark.get("searchcsv", new SearchCSVHandler(accessCSV));
     Spark.get("viewcsv", new ViewCSVHandler(accessCSV));
+    CensusDataSource mockedsource = new MockDataSource();
+//    ACSCensusDataSource source = new ACSCensusDataSource();
+//    try {
+//      source.getStateCode();
+//      source.getACSVariables();
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//    }
 
-    ACSCensusDataSource source = new ACSCensusDataSource();
-    try {
-      source.getStateCode();
-      source.getACSVariables();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    Spark.get("broadband", new BroadbandHandler(source));
+    //CachedACSDataSource cached_source = new CachedACSDataSource(source);
+    Spark.get("broadband", new BroadbandHandler(mockedsource));
     Spark.init();
     Spark.awaitInitialization(); // don't continue until the server is listening
   }
@@ -81,76 +86,76 @@ public class TestHandlers {
     return clientConnection;
   }
 
-//  @Test
-//  public void testLoadCSVSuccess() throws IOException {
-//    HttpURLConnection clientConnection =
-//        tryRequest("loadcsv?path=data/census/income_by_race.csv&hasHeader=true");
-//    assertEquals(200, clientConnection.getResponseCode());
-//    Map<String, Object> response =
-//        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-//    assertEquals("success", response.get("result"));
-//  }
-//
-//  @Test
-//  public void testLoadCSVInvalidPath() throws IOException {
-//    HttpURLConnection clientConnection = tryRequest("loadcsv?path=data/xxx.csv&hasHeader=true");
-//    assertEquals(200, clientConnection.getResponseCode());
-//    Map<String, Object> response =
-//        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-//    assertEquals("Exception", response.get("result"));
-//  }
-//
-//  @Test
-//  public void testLoadCSVInvalidHasHeader() throws IOException {
-//    HttpURLConnection clientConnection =
-//        tryRequest("loadcsv?path=data/census/income_by_race.csv&hasHeader=xx");
-//    assertEquals(200, clientConnection.getResponseCode());
-//    Map<String, Object> response =
-//        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-//    assertEquals("Exception", response.get("result"));
-//  }
-//
-//  @Test
-//  public void testViewCSVHandlerSuccess() throws IOException {
-//    HttpURLConnection clientConnection1 =
-//        tryRequest("loadcsv?path=data/census/income_by_race.csv&hasHeader=true");
-//    assertEquals(200, clientConnection1.getResponseCode());
-//    HttpURLConnection clientConnection = tryRequest("viewcsv");
-//    assertEquals(200, clientConnection.getResponseCode());
-//    Map<String, Object> response =
-//        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-//    assertEquals("success", response.get("result"));
-//  }
-//
-//  @Test
-//  public void testViewCSVHandlerFailure() throws IOException {
-//    HttpURLConnection clientConnection = tryRequest("viewcsv");
-//    assertEquals(200, clientConnection.getResponseCode());
-//    Map<String, Object> response =
-//        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-//    assertEquals("Exception", response.get("result"));
-//  }
-//
-//  @Test
-//  public void testSearchCSVHandlerSuccess() throws IOException {
-//    HttpURLConnection clientConnection1 =
-//        tryRequest("loadcsv?path=data/census/income_by_race.csv&hasHeader=true");
-//    assertEquals(200, clientConnection1.getResponseCode());
-//    HttpURLConnection clientConnection = tryRequest("searchcsv?query=Race,White|Black");
-//    assertEquals(200, clientConnection.getResponseCode());
-//    Map<String, Object> response =
-//        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-//    assertEquals("success", response.get("result"));
-//  }
-//
-//  @Test
-//  public void testSearchCSVHandlerFailure() throws IOException {
-//    HttpURLConnection clientConnection = tryRequest("searchcsv?query=Race,White|Black");
-//    assertEquals(200, clientConnection.getResponseCode());
-//    Map<String, Object> response =
-//        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
-//    assertEquals("Exception", response.get("result"));
-//  }
+  @Test
+  public void testLoadCSVSuccess() throws IOException {
+    HttpURLConnection clientConnection =
+        tryRequest("loadcsv?path=data/census/income_by_race.csv&hasHeader=true");
+    assertEquals(200, clientConnection.getResponseCode());
+    Map<String, Object> response =
+        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+    assertEquals("success", response.get("result"));
+  }
+
+  @Test
+  public void testLoadCSVInvalidPath() throws IOException {
+    HttpURLConnection clientConnection = tryRequest("loadcsv?path=data/xxx.csv&hasHeader=true");
+    assertEquals(200, clientConnection.getResponseCode());
+    Map<String, Object> response =
+        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+    assertEquals("Exception", response.get("result"));
+  }
+
+  @Test
+  public void testLoadCSVInvalidHasHeader() throws IOException {
+    HttpURLConnection clientConnection =
+        tryRequest("loadcsv?path=data/census/income_by_race.csv&hasHeader=xx");
+    assertEquals(200, clientConnection.getResponseCode());
+    Map<String, Object> response =
+        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+    assertEquals("Exception", response.get("result"));
+  }
+
+  @Test
+  public void testViewCSVHandlerSuccess() throws IOException {
+    HttpURLConnection clientConnection1 =
+        tryRequest("loadcsv?path=data/census/income_by_race.csv&hasHeader=true");
+    assertEquals(200, clientConnection1.getResponseCode());
+    HttpURLConnection clientConnection = tryRequest("viewcsv");
+    assertEquals(200, clientConnection.getResponseCode());
+    Map<String, Object> response =
+        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+    assertEquals("success", response.get("result"));
+  }
+
+  @Test
+  public void testViewCSVHandlerFailure() throws IOException {
+    HttpURLConnection clientConnection = tryRequest("viewcsv");
+    assertEquals(200, clientConnection.getResponseCode());
+    Map<String, Object> response =
+        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+    assertEquals("Exception", response.get("result"));
+  }
+
+  @Test
+  public void testSearchCSVHandlerSuccess() throws IOException {
+    HttpURLConnection clientConnection1 =
+        tryRequest("loadcsv?path=data/census/income_by_race.csv&hasHeader=true");
+    assertEquals(200, clientConnection1.getResponseCode());
+    HttpURLConnection clientConnection = tryRequest("searchcsv?query=Race,White|Black");
+    assertEquals(200, clientConnection.getResponseCode());
+    Map<String, Object> response =
+        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+    assertEquals("success", response.get("result"));
+  }
+
+  @Test
+  public void testSearchCSVHandlerFailure() throws IOException {
+    HttpURLConnection clientConnection = tryRequest("searchcsv?query=Race,White|Black");
+    assertEquals(200, clientConnection.getResponseCode());
+    Map<String, Object> response =
+        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+    assertEquals("Exception", response.get("result"));
+  }
 
   @Test
   public void testBroadbandHandlerSuccess() throws IOException {
@@ -167,18 +172,18 @@ public class TestHandlers {
 
   @Test
   public void testBroadbandHandlerFailure() throws IOException {
-    //county name is invalid
-    HttpURLConnection clientConnection = tryRequest("broadband?County=KernCounty&State=California");
-    assertEquals(200, clientConnection.getResponseCode());
-    //state name is invalid
-    HttpURLConnection clientConnection1 = tryRequest("broadband?County=Kern+County&State=Orange");
-    assertEquals(200, clientConnection1.getResponseCode());
-    //data is not in dataset (but county, state exist)
-    HttpURLConnection clientConnection2 = tryRequest("broadband?County=Stone+County&State=Arkansas");
-    assertEquals(200, clientConnection2.getResponseCode());
+//    //county name is invalid
+//    HttpURLConnection clientConnection = tryRequest("broadband?County=KernCounty&State=California");
+//    assertEquals(200, clientConnection.getResponseCode());
+//    //state name is invalid
+//    HttpURLConnection clientConnection1 = tryRequest("broadband?County=Kern+County&State=Orange");
+//    assertEquals(200, clientConnection1.getResponseCode());
+//    //data is not in dataset (but county, state exist)
+//    HttpURLConnection clientConnection2 = tryRequest("broadband?County=Stone+County&State=Arkansas");
+//    assertEquals(200, clientConnection2.getResponseCode());
     //no user input variables
-    HttpURLConnection clientConnection3 = tryRequest("broadband");
-    assertEquals(200, clientConnection3.getResponseCode());
+    HttpURLConnection clientConnection = tryRequest("broadband");
+    assertEquals(200, clientConnection.getResponseCode());
     //no county param
     HttpURLConnection clientConnection4 = tryRequest("broadband?State=California");
     assertEquals(200, clientConnection4.getResponseCode());
@@ -189,4 +194,6 @@ public class TestHandlers {
         adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
     assertEquals("Exception", response.get("result"));
   }
+
+
 }

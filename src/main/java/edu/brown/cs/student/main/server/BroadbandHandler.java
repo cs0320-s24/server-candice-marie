@@ -34,8 +34,14 @@ public class BroadbandHandler implements Route {
     Map<String, Object> responsemap = new HashMap<>();
     String countyname = request.queryParams("County");
     String statename = request.queryParams("State");
+
+
+    String variablename = request.queryParams("ACSVariable");
+
+
     System.out.println(countyname);
     System.out.println(statename);
+
     if (countyname == null & statename == null) {
       responsemap.put("result", "Exception");
       responsemap.put("error", "county name and state name not provided");
@@ -54,23 +60,42 @@ public class BroadbandHandler implements Route {
       String responseMapString = adapter.toJson(responsemap);
       return responseMapString;
     }
-    System.out.println("state=" + parameters);
 
-    try {
-      String broadbandpercentage = state.getBroadbandPercentage(countyname, statename);
-      responsemap.put("result", "success");
-      responsemap.put("broadbandpercentage", broadbandpercentage);
-      responsemap.put("county name", countyname);
-      responsemap.put("state name", statename);
-      String localdatetime = LocalDateTime.now().toString();
-      responsemap.put("date and time", localdatetime);
-    } catch (Exception e) {
-      responsemap.put("result", "Exception");
-      responsemap.put("error", e.toString());
-      e.printStackTrace();
+    if (variablename == null) {
+      try {
+        String broadbandpercentage = state.getBroadbandPercentage(countyname, statename);
+        responsemap.put("result", "success");
+        responsemap.put("broadbandpercentage", broadbandpercentage);
+        responsemap.put("county name", countyname);
+        responsemap.put("state name", statename);
+        String localdatetime = LocalDateTime.now().toString();
+        responsemap.put("date and time", localdatetime);
+      } catch (Exception e) {
+        responsemap.put("result", "Exception");
+        responsemap.put("error", e.toString());
+        e.printStackTrace();
+      }
+      String responseMapString = adapter.toJson(responsemap);
+      return responseMapString;
+    } else {
+      try {
+        String broadbandpercentage = state.getBroadbandPercentage(countyname, statename, variablename);
+        responsemap.put("result", "success");
+        responsemap.put("broadbandpercentage", broadbandpercentage);
+        responsemap.put("county name", countyname);
+        responsemap.put("state name", statename);
+        String localdatetime = LocalDateTime.now().toString();
+        responsemap.put("date and time", localdatetime);
+      } catch (Exception e) {
+        responsemap.put("result", "Exception");
+        responsemap.put("error", e.toString());
+        e.printStackTrace();
+      }
+      String responseMapString = adapter.toJson(responsemap);
+      return responseMapString;
     }
-    String responseMapString = adapter.toJson(responsemap);
-    return responseMapString;
+
+
     // .getBroadband(countyname, statename);
   }
 }
