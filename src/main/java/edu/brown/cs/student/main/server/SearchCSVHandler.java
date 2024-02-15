@@ -37,8 +37,15 @@ public class SearchCSVHandler implements Route {
     }
     try {
       List<List<String>> searchedResult = this.accessCSV.searchCSV(query);
-      responseMap.put("result", "success");
-      responseMap.put("searchedResult", searchedResult);
+
+      if (searchedResult.isEmpty()) {
+        responseMap.put("result", "Exception");
+        responseMap.put("searchedResult", "No entries found with query: %s.".formatted(query));
+      } else {
+        responseMap.put("result", "success");
+        responseMap.put("searchedResult", searchedResult);
+      }
+
     } catch (Exception e) {
       responseMap.put("result", "Exception");
       responseMap.put("error", e.toString());
