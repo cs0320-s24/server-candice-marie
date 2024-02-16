@@ -129,7 +129,7 @@ public class ACSCensusDataSource implements CensusDataSource {
       for (List<String> i : body) {
         acsVariables.add(i.get(0));
       }
-      System.out.println("ACS VARS=" + acsVariables);
+      //      System.out.println("ACS VARS=" + acsVariables);
     } catch (Exception e) {
       throw new DataSourceException(e.getMessage());
     }

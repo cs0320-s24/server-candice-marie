@@ -2,6 +2,7 @@ package edu.brown.cs.student.main.broadband;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.common.cache.CacheStats;
 import com.google.common.cache.LoadingCache;
 import edu.brown.cs.student.main.broadband.exceptions.InputNotFoundException;
 import java.util.concurrent.TimeUnit;
@@ -10,6 +11,7 @@ public class CachedACSDataSource implements CensusDataSource {
 
   private final ACSCensusDataSource wrappedACSCensusDataSource;
   private final LoadingCache<String, String> cache;
+  public CacheStats cache_stats;
 
   public CachedACSDataSource(ACSCensusDataSource toWrap) {
     this.wrappedACSCensusDataSource = toWrap;
@@ -95,5 +97,25 @@ public class CachedACSDataSource implements CensusDataSource {
     // For debugging and demo (would remove in a "real" version):
     System.out.println(cache.stats());
     return result;
+  }
+
+  public int getCacheHitCount() {
+    int hitcount = (int) cache.stats().hitCount();
+    return hitcount;
+  }
+
+  public int getCacheMissCount() {
+    int misscount = (int) cache.stats().missCount();
+    return misscount;
+  }
+
+  public int getCacheLoadCount() {
+    int loadcount = (int) cache.stats().loadCount();
+    return loadcount;
+  }
+
+  public int getCacheEvictionCount() {
+    int evictioncount = (int) cache.stats().evictionCount();
+    return evictioncount;
   }
 }
