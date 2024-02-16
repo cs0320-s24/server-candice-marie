@@ -169,20 +169,42 @@ public class TestHandlers {
   }
 
   @Test
+  public void testBroadbandHandlerThreeParamsSuccess() throws IOException {
+    HttpURLConnection clientConnection =
+        tryRequest("broadband?County=Napa%20County&State=California&ACSVariable=S2704_C01_022E");
+    assertEquals(200, clientConnection.getResponseCode());
+    Map<String, Object> response =
+        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+    assertEquals("success", response.get("result"));
+    assertEquals("100", response.get("S2704_C01_022E"));
+  }
+
+  @Test
+  public void testBroadbandHandlerThreeParams() throws IOException {
+    HttpURLConnection clientConnection =
+        tryRequest("broadband?County=Napa%20County&State=California&ACSVariable=abcdefg");
+    assertEquals(200, clientConnection.getResponseCode());
+    Map<String, Object> response =
+        adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
+    assertEquals("success", response.get("result"));
+    HttpURLConnection clientConnection1 =
+        tryRequest("broadband?County=Napa%20County&State=California&ACSVariable=S2802_C03_022E");
+    assertEquals(200, clientConnection1.getResponseCode());
+    Map<String, Object> response1 =
+        adapter.fromJson(new Buffer().readFrom(clientConnection1.getInputStream()));
+    assertEquals("success", response1.get("result"));
+    assertEquals("100", response1.get("broadbandpercentage"));
+    HttpURLConnection clientConnection2 =
+        tryRequest("broadband?County=Napa%20County&State=California&ACSVariable=S0102_C02_044E");
+    assertEquals(200, clientConnection2.getResponseCode());
+    Map<String, Object> response2 =
+        adapter.fromJson(new Buffer().readFrom(clientConnection2.getInputStream()));
+    assertEquals("success", response2.get("result"));
+    assertEquals("100", response2.get("S0102_C02_044E"));
+  }
+
+  @Test
   public void testBroadbandHandlerFailure() throws IOException {
-    //    //county name is invalid
-    //    HttpURLConnection clientConnection =
-    // tryRequest("broadband?County=KernCounty&State=California");
-    //    assertEquals(200, clientConnection.getResponseCode());
-    //    //state name is invalid
-    //    HttpURLConnection clientConnection1 =
-    // tryRequest("broadband?County=Kern+County&State=Orange");
-    //    assertEquals(200, clientConnection1.getResponseCode());
-    //    //data is not in dataset (but county, state exist)
-    //    HttpURLConnection clientConnection2 =
-    // tryRequest("broadband?County=Stone+County&State=Arkansas");
-    //    assertEquals(200, clientConnection2.getResponseCode());
-    // no user input variables
     HttpURLConnection clientConnection = tryRequest("broadband");
     assertEquals(200, clientConnection.getResponseCode());
     // no county param
@@ -195,4 +217,25 @@ public class TestHandlers {
         adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
     assertEquals("Exception", response.get("result"));
   }
+
+  //  @Test
+  //  public void testBroadbandHandlerThreeVariables() throws IOException {
+  //    HttpURLConnection clientConnection = tryRequest("broadband");
+  //    assertEquals(200, clientConnection.getResponseCode());
+  //
+  //  }
 }
+
+//    //county name is invalid
+//    HttpURLConnection clientConnection =
+// tryRequest("broadband?County=KernCounty&State=California");
+//    assertEquals(200, clientConnection.getResponseCode());
+//    //state name is invalid
+//    HttpURLConnection clientConnection1 =
+// tryRequest("broadband?County=Kern+County&State=Orange");
+//    assertEquals(200, clientConnection1.getResponseCode());
+//    //data is not in dataset (but county, state exist)
+//    HttpURLConnection clientConnection2 =
+// tryRequest("broadband?County=Stone+County&State=Arkansas");
+//    assertEquals(200, clientConnection2.getResponseCode());
+// no user input variables

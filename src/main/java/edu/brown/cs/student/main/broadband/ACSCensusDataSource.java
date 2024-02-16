@@ -173,6 +173,7 @@ public class ACSCensusDataSource implements CensusDataSource {
         throw new DataSourceException("malformed response from ACS");
       }
       String broadband_percentage = body.get(1).get(1);
+
       if (broadband_percentage == null) return "null";
       return broadband_percentage;
 

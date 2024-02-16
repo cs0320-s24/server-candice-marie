@@ -21,7 +21,7 @@ public class CachedACSDataSource implements CensusDataSource {
             // to fulfill this spec: https://edstem.org/us/courses/54377/discussion/4348144
 
             // How many entries maximum in the cache?
-            .maximumSize(10)
+            .maximumSize(3)
             // How long should entries remain in the cache?
             .expireAfterWrite(1, TimeUnit.MINUTES)
             // Keep statistical info around for profiling purposes
@@ -80,6 +80,7 @@ public class CachedACSDataSource implements CensusDataSource {
   public String getBroadbandPercentage(String countyname, String statename) {
     // String public_broadband = Collections.unmodifiable
     String target = countyname + "," + statename;
+    System.out.println(target);
     String result = cache.getUnchecked(target);
     // For debugging and demo (would remove in a "real" version):
     System.out.println(cache.stats());
