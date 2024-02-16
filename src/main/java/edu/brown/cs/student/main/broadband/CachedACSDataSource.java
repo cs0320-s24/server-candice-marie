@@ -2,6 +2,7 @@ package edu.brown.cs.student.main.broadband;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.common.cache.CacheStats;
 import com.google.common.cache.LoadingCache;
 import edu.brown.cs.student.main.broadband.exceptions.InputNotFoundException;
 import java.util.concurrent.TimeUnit;
@@ -10,6 +11,7 @@ public class CachedACSDataSource implements CensusDataSource {
 
   private final ACSCensusDataSource wrappedACSCensusDataSource;
   private final LoadingCache<String, String> cache;
+  public CacheStats cache_stats;
 
   public CachedACSDataSource(ACSCensusDataSource toWrap) {
     this.wrappedACSCensusDataSource = toWrap;
@@ -21,7 +23,7 @@ public class CachedACSDataSource implements CensusDataSource {
             // to fulfill this spec: https://edstem.org/us/courses/54377/discussion/4348144
 
             // How many entries maximum in the cache?
-            .maximumSize(10)
+            .maximumSize(3)
             // How long should entries remain in the cache?
             .expireAfterWrite(1, TimeUnit.MINUTES)
             // Keep statistical info around for profiling purposes
@@ -80,6 +82,7 @@ public class CachedACSDataSource implements CensusDataSource {
   public String getBroadbandPercentage(String countyname, String statename) {
     // String public_broadband = Collections.unmodifiable
     String target = countyname + "," + statename;
+    System.out.println(target);
     String result = cache.getUnchecked(target);
     // For debugging and demo (would remove in a "real" version):
     System.out.println(cache.stats());
@@ -94,5 +97,25 @@ public class CachedACSDataSource implements CensusDataSource {
     // For debugging and demo (would remove in a "real" version):
     System.out.println(cache.stats());
     return result;
+  }
+
+  public int getCacheHitCount() {
+    int hitcount = (int) cache.stats().hitCount();
+    return hitcount;
+  }
+
+  public int getCacheMissCount() {
+    int misscount = (int) cache.stats().missCount();
+    return misscount;
+  }
+
+  public int getCacheLoadCount() {
+    int loadcount = (int) cache.stats().loadCount();
+    return loadcount;
+  }
+
+  public int getCacheEvictionCount() {
+    int evictioncount = (int) cache.stats().evictionCount();
+    return evictioncount;
   }
 }

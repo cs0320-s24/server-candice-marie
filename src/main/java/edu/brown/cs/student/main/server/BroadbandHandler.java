@@ -75,6 +75,23 @@ public class BroadbandHandler implements Route {
       }
       String responseMapString = adapter.toJson(responsemap);
       return responseMapString;
+    } else if (!variablename.equals("S2802_C03_022E")) {
+      try {
+        String broadbandpercentage =
+            state.getBroadbandPercentage(countyname, statename, variablename);
+        responsemap.put("result", "success");
+        responsemap.put(variablename, broadbandpercentage);
+        responsemap.put("county name", countyname);
+        responsemap.put("state name", statename);
+        String localdatetime = LocalDateTime.now().toString();
+        responsemap.put("date and time", localdatetime);
+      } catch (Exception e) {
+        responsemap.put("result", "Exception");
+        responsemap.put("error", e.toString());
+        e.printStackTrace();
+      }
+      String responseMapString = adapter.toJson(responsemap);
+      return responseMapString;
     } else {
       try {
         String broadbandpercentage =
@@ -93,7 +110,6 @@ public class BroadbandHandler implements Route {
       String responseMapString = adapter.toJson(responsemap);
       return responseMapString;
     }
-
     // .getBroadband(countyname, statename);
   }
 }

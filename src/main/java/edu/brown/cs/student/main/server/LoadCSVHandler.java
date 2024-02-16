@@ -41,6 +41,12 @@ public class LoadCSVHandler implements Route {
       String responseMapString = adapter.toJson(responseMap);
       return responseMapString;
     }
+    if (hasHeaderString == null) {
+      responseMap.put("result", "Exception");
+      responseMap.put("error", "hasHeader parameter is not provided.");
+      String responseMapString = adapter.toJson(responseMap);
+      return responseMapString;
+    }
     if (!hasHeaderString.equals("true") && !hasHeaderString.equals("false")) {
       responseMap.put("result", "Exception");
       responseMap.put(
