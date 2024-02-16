@@ -150,7 +150,7 @@ public class ACSCensusDataSource implements CensusDataSource {
 
     try {
       String param;
-      if (acsVariable=="S2802_C03_022E") {
+      if (acsVariable.equals("S2802_C03_022E")) {
         param = "subject";
       } else {
         param = "profile";
@@ -158,16 +158,13 @@ public class ACSCensusDataSource implements CensusDataSource {
           throw new InputNotFoundException("The acs variable you entered (" + acsVariable);
         }
       }
-      String endpointParam = "/data/2021/acs/acs1/%s/variables?get=NAME,%s&for=county:".formatted(param, acsVariable)
-          + county_code
-          + "&in=state:"
-          + state_code;
+      String endpointParam =
+          "/data/2021/acs/acs1/%s/variables?get=NAME,%s&for=county:".formatted(param, acsVariable)
+              + county_code
+              + "&in=state:"
+              + state_code;
 
-      URL requestURL =
-          new URL(
-              "https",
-              "api.census.gov",endpointParam
-              );
+      URL requestURL = new URL("https", "api.census.gov", endpointParam);
       System.out.println("URL=" + requestURL);
       HttpURLConnection clientConnection = connect(requestURL);
       Moshi moshi = new Moshi.Builder().build();

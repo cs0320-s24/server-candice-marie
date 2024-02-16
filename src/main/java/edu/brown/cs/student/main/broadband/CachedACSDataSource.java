@@ -71,7 +71,6 @@ public class CachedACSDataSource implements CensusDataSource {
                                 + statename
                                 + ", "
                                 + acsvariable);
-                        // return "";//TODO: may need error handling?
                       }
                     }
                   }
