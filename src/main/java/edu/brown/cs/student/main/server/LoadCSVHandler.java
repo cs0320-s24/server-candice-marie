@@ -29,10 +29,9 @@ public class LoadCSVHandler implements Route {
     adapter = moshi.adapter(type);
   }
   /**
-   * Handles a request to load a CSV file. The request is expected to contain query parameters
-   * for the file path ('path') and whether the file has a header ('hasHeader').
-   * Responds with a JSON object indicating the result of the operation, which can include success
-   * or error messages.
+   * Handles a request to load a CSV file. The request is expected to contain query parameters for
+   * the file path ('path') and whether the file has a header ('hasHeader'). Responds with a JSON
+   * object indicating the result of the operation, which can include success or error messages.
    *
    * @param request The Spark request object, containing query parameters.
    * @param response The Spark response object, used to modify the response properties.

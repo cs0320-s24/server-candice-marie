@@ -11,23 +11,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 /**
- * AccessCSV provides functionalities to load, view, and search through CSV files.
- * It relies on a Parser to parse the CSV file into a structured format that can be easily queried.
+ * AccessCSV provides functionalities to load, view, and search through CSV files. It relies on a
+ * Parser to parse the CSV file into a structured format that can be easily queried.
  */
 public class AccessCSV {
   private Parser<List<String>> parser;
   private ParsedResult<List<String>> parsedResult;
   private Searcher<String> searcher;
-  /**
-   * Constructs a new AccessCSV instance with no initial CSV file loaded.
-   */
+  /** Constructs a new AccessCSV instance with no initial CSV file loaded. */
   public AccessCSV() {
     parser = null;
   }
   /**
-   * Loads a CSV file from the specified filePath. If the file contains a header row,
-   * this can be indicated with the hasHeader parameter.
+   * Loads a CSV file from the specified filePath. If the file contains a header row, this can be
+   * indicated with the hasHeader parameter.
    *
    * @param filePath The path to the CSV file to be loaded.
    * @param hasHeader Indicates whether the first row of the CSV file is a header row.
@@ -45,8 +44,8 @@ public class AccessCSV {
     this.searcher = new Searcher<>(this.parsedResult);
   }
   /**
-   * Returns the contents of the currently loaded CSV file as a list of rows, where each row is
-   * a list of strings.
+   * Returns the contents of the currently loaded CSV file as a list of rows, where each row is a
+   * list of strings.
    *
    * @return A list of rows with each row represented as a list of strings.
    * @throws CsvNotLoadedException if no CSV file has been loaded.
