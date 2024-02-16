@@ -137,9 +137,6 @@ public class ACSCensusDataSource implements CensusDataSource {
 
   public String getBroadbandPercentage(String countyname, String statename, String acsVariable)
       throws InputNotFoundException, DataSourceException, DataNotFoundException {
-    if (!acsVariable.contains(acsVariable)) {
-      throw new InputNotFoundException("The acs variable you entered (" + acsVariable);
-    }
     if (!statecode_map.containsKey(statename)) {
       throw new InputNotFoundException("The state you entered (" + statename);
     }
@@ -152,14 +149,25 @@ public class ACSCensusDataSource implements CensusDataSource {
     String county_code = countycode_map.get(countyname);
 
     try {
+      String param;
+      if (acsVariable=="S2802_C03_022E") {
+        param = "subject";
+      } else {
+        param = "profile";
+        if (!acsVariable.contains(acsVariable)) {
+          throw new InputNotFoundException("The acs variable you entered (" + acsVariable);
+        }
+      }
+      String endpointParam = "/data/2021/acs/acs1/%s/variables?get=NAME,%s&for=county:".formatted(param, acsVariable)
+          + county_code
+          + "&in=state:"
+          + state_code;
+
       URL requestURL =
           new URL(
               "https",
-              "api.census.gov",
-              "/data/2021/acs/acs1/subject/variables?get=NAME,%s&for=county:".formatted(acsVariable)
-                  + county_code
-                  + "&in=state:"
-                  + state_code);
+              "api.census.gov",endpointParam
+              );
       System.out.println("URL=" + requestURL);
       HttpURLConnection clientConnection = connect(requestURL);
       Moshi moshi = new Moshi.Builder().build();
