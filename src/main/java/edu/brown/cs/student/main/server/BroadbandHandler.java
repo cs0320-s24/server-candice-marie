@@ -75,7 +75,7 @@ public class BroadbandHandler implements Route {
       }
       String responseMapString = adapter.toJson(responsemap);
       return responseMapString;
-    } else if (!variablename.equalsIgnoreCase("S2802_C03_022E")) {
+    } else if (!variablename.equals("S2802_C03_022E")) {
       try {
         String broadbandpercentage =
             state.getBroadbandPercentage(countyname, statename, variablename);
