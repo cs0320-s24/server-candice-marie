@@ -11,16 +11,29 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+/**
+ * AccessCSV provides functionalities to load, view, and search through CSV files.
+ * It relies on a Parser to parse the CSV file into a structured format that can be easily queried.
+ */
 public class AccessCSV {
   private Parser<List<String>> parser;
   private ParsedResult<List<String>> parsedResult;
   private Searcher<String> searcher;
-
+  /**
+   * Constructs a new AccessCSV instance with no initial CSV file loaded.
+   */
   public AccessCSV() {
     parser = null;
   }
-
+  /**
+   * Loads a CSV file from the specified filePath. If the file contains a header row,
+   * this can be indicated with the hasHeader parameter.
+   *
+   * @param filePath The path to the CSV file to be loaded.
+   * @param hasHeader Indicates whether the first row of the CSV file is a header row.
+   * @throws FileNotFoundException if the file is not found under the designated data directory.
+   * @throws Exception for other parsing errors encountered during file loading.
+   */
   public void LoadCSV(String filePath, boolean hasHeader) throws Exception {
     if (!isUnderDataDirectory(filePath)) {
       throw new FileNotFoundException(
@@ -31,7 +44,13 @@ public class AccessCSV {
     this.parsedResult = parser.parse();
     this.searcher = new Searcher<>(this.parsedResult);
   }
-
+  /**
+   * Returns the contents of the currently loaded CSV file as a list of rows, where each row is
+   * a list of strings.
+   *
+   * @return A list of rows with each row represented as a list of strings.
+   * @throws CsvNotLoadedException if no CSV file has been loaded.
+   */
   public List<List<String>> ViewCSV() throws CsvNotLoadedException {
     if (parser == null) {
       throw new CsvNotLoadedException("Cannot view csv. ");

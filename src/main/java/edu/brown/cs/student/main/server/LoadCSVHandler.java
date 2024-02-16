@@ -15,7 +15,12 @@ public class LoadCSVHandler implements Route {
 
   private final AccessCSV accessCSV;
   private final JsonAdapter<Map<String, Object>> adapter;
-
+  /**
+   * Constructs a LoadCSVHandler with a specified AccessCSV instance for handling CSV loading.
+   * Initializes a JSON adapter for converting response data into JSON format.
+   *
+   * @param accessCSV The {@link AccessCSV} instance to use for loading CSV files.
+   */
   public LoadCSVHandler(AccessCSV accessCSV) {
     this.accessCSV = accessCSV;
     // Create a JSON adapter for the Map type
@@ -23,7 +28,16 @@ public class LoadCSVHandler implements Route {
     Moshi moshi = new Moshi.Builder().build();
     adapter = moshi.adapter(type);
   }
-
+  /**
+   * Handles a request to load a CSV file. The request is expected to contain query parameters
+   * for the file path ('path') and whether the file has a header ('hasHeader').
+   * Responds with a JSON object indicating the result of the operation, which can include success
+   * or error messages.
+   *
+   * @param request The Spark request object, containing query parameters.
+   * @param response The Spark response object, used to modify the response properties.
+   * @return A string representing a JSON object with the result of the CSV loading operation.
+   */
   @Override
   public String handle(Request request, Response response) {
     String path = request.queryParams("path");
