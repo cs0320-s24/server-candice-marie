@@ -50,7 +50,7 @@ public class TestCachedDataSource {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    cached_source = new CachedACSDataSource(source);
+    this.cached_source = new CachedACSDataSource(source);
     Spark.get("broadband", new BroadbandHandler(cached_source));
     Spark.init();
     Spark.awaitInitialization(); /* don't continue until the server is listening */
