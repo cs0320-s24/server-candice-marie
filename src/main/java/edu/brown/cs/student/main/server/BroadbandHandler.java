@@ -6,9 +6,7 @@ import com.squareup.moshi.Types;
 import edu.brown.cs.student.main.broadband.CensusDataSource;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import spark.Request;
@@ -17,8 +15,9 @@ import spark.Route;
 
 /**
  * BroadbandHandler
+ *
  * @p
- * */
+ */
 public class BroadbandHandler implements Route {
 
   private final CensusDataSource state;
@@ -39,9 +38,9 @@ public class BroadbandHandler implements Route {
     String countyname = request.queryParams("County");
     String statename = request.queryParams("State");
     String variablename = request.queryParams("ACSVariable");
-    System.out.println("county=" +countyname);
-    System.out.println("state="+statename);
-    System.out.println("vars="+variablename);
+    System.out.println("county=" + countyname);
+    System.out.println("state=" + statename);
+    System.out.println("vars=" + variablename);
 
     String[] acsvariable_list = variablename.split(",");
     System.out.println(acsvariable_list);
@@ -80,10 +79,7 @@ public class BroadbandHandler implements Route {
       }
       String responseMapString = adapter.toJson(responsemap);
       return responseMapString;
-    }
-
-
-    else if (!variablename.equals("S2802_C03_022E")) {
+    } else if (!variablename.equals("S2802_C03_022E")) {
       System.out.println("varibale not equal to broadband");
       if (acsvariable_list.length == 1) {
         System.out.println("only one var");
@@ -103,13 +99,12 @@ public class BroadbandHandler implements Route {
         }
         String responseMapString = adapter.toJson(responsemap);
         return responseMapString;
-      } else if (acsvariable_list.length > 1) {
+      } else {
         System.out.println("multiple vars");
         Map<Integer, Map<String, Object>> output_list = new HashMap<>();
         for (String s : acsvariable_list) {
           try {
-            String broadbandpercentage =
-                state.getBroadbandPercentage(countyname, statename, s);
+            String broadbandpercentage = state.getBroadbandPercentage(countyname, statename, s);
             responsemap.put("result", "success");
             String localdatetime = LocalDateTime.now().toString();
             responsemap.put("date and time", localdatetime);
@@ -125,26 +120,23 @@ public class BroadbandHandler implements Route {
         String responseMapString = adapter.toJson(responsemap);
         return responseMapString;
       }
-    }
-
-
-    else {
-        try {
-          String broadbandpercentage =
-              state.getBroadbandPercentage(countyname, statename, variablename);
-          responsemap.put("result", "success");
-          responsemap.put("broadbandpercentage", broadbandpercentage);
-          responsemap.put("county name", countyname);
-          responsemap.put("state name", statename);
-          String localdatetime = LocalDateTime.now().toString();
-          responsemap.put("date and time", localdatetime);
-        } catch (Exception e) {
-          responsemap.put("result", "Exception");
-          responsemap.put("error", e.toString());
-          e.printStackTrace();
-        }
-        String responseMapString = adapter.toJson(responsemap);
-        return responseMapString;
+    } else {
+      try {
+        String broadbandpercentage =
+            state.getBroadbandPercentage(countyname, statename, variablename);
+        responsemap.put("result", "success");
+        responsemap.put("broadbandpercentage", broadbandpercentage);
+        responsemap.put("county name", countyname);
+        responsemap.put("state name", statename);
+        String localdatetime = LocalDateTime.now().toString();
+        responsemap.put("date and time", localdatetime);
+      } catch (Exception e) {
+        responsemap.put("result", "Exception");
+        responsemap.put("error", e.toString());
+        e.printStackTrace();
       }
+      String responseMapString = adapter.toJson(responsemap);
+      return responseMapString;
+    }
   }
 }

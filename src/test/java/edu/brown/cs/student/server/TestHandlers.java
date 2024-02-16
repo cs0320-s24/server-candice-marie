@@ -26,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import spark.Spark;
 
+/** This class tests BroadbandHandler, LoadCSVHandler, SearchCSVHandler, and ViewCSVHandler */
 public class TestHandlers {
   private final JsonAdapter<Map<String, Object>> adapter;
 
@@ -43,12 +44,13 @@ public class TestHandlers {
 
   @BeforeEach
   public void setup() {
-    // Re-initialize state, etc. for _every_ test method run
+    /* Re-initialize state, etc. for _every_ test method run */
     AccessCSV accessCSV = new AccessCSV();
-    // In fact, restart the entire Spark server for every test!
+    /* In fact, restart the entire Spark server for every test! */
     Spark.get("loadcsv", new LoadCSVHandler(accessCSV));
     Spark.get("searchcsv", new SearchCSVHandler(accessCSV));
     Spark.get("viewcsv", new ViewCSVHandler(accessCSV));
+    /* testing with mocked data source to ensure consistent functionality with various data sources */
     CensusDataSource mockedsource = new MockDataSource();
     //    ACSCensusDataSource source = new ACSCensusDataSource();
     //    try {
@@ -57,21 +59,20 @@ public class TestHandlers {
     //    } catch (Exception e) {
     //      e.printStackTrace();
     //    }
-
     // CachedACSDataSource cached_source = new CachedACSDataSource(source);
     Spark.get("broadband", new BroadbandHandler(mockedsource));
     Spark.init();
-    Spark.awaitInitialization(); // don't continue until the server is listening
+    Spark.awaitInitialization(); /* don't continue until the server is listening */
   }
 
   @AfterEach
   public void teardown() {
-    // Gracefully stop Spark listening on both endpoints after each test
+    /* Gracefully stop Spark listening on both endpoints after each test */
     Spark.unmap("loadcsv");
     Spark.unmap("searchcsv");
     Spark.unmap("viewcsv");
     Spark.unmap("broadband");
-    Spark.awaitStop(); // don't proceed until the server is stopped
+    Spark.awaitStop(); /* don't proceed until the server is stopped */
   }
 
   private static HttpURLConnection tryRequest(String apiCall) throws IOException {
@@ -217,25 +218,4 @@ public class TestHandlers {
         adapter.fromJson(new Buffer().readFrom(clientConnection.getInputStream()));
     assertEquals("Exception", response.get("result"));
   }
-
-  //  @Test
-  //  public void testBroadbandHandlerThreeVariables() throws IOException {
-  //    HttpURLConnection clientConnection = tryRequest("broadband");
-  //    assertEquals(200, clientConnection.getResponseCode());
-  //
-  //  }
 }
-
-//    //county name is invalid
-//    HttpURLConnection clientConnection =
-// tryRequest("broadband?County=KernCounty&State=California");
-//    assertEquals(200, clientConnection.getResponseCode());
-//    //state name is invalid
-//    HttpURLConnection clientConnection1 =
-// tryRequest("broadband?County=Kern+County&State=Orange");
-//    assertEquals(200, clientConnection1.getResponseCode());
-//    //data is not in dataset (but county, state exist)
-//    HttpURLConnection clientConnection2 =
-// tryRequest("broadband?County=Stone+County&State=Arkansas");
-//    assertEquals(200, clientConnection2.getResponseCode());
-// no user input variables

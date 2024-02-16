@@ -21,6 +21,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import spark.Spark;
 
+/**
+ * This class tests that the getBroadbandpercentage methods in Cached ACSDataSource produce the same
+ * results as ACSCensusDataSource and that the load is implemented correctly
+ */
 public class TestCachedDataSource {
 
   private final JsonAdapter<Map<String, Object>> adapter;
@@ -34,7 +38,7 @@ public class TestCachedDataSource {
 
   public static void setup_before_everything() {
     Spark.port(0);
-    Logger.getLogger("").setLevel(Level.WARNING); // empty name = root logger
+    Logger.getLogger("").setLevel(Level.WARNING); /* empty name = root logger */
   }
 
   @BeforeEach
@@ -49,14 +53,14 @@ public class TestCachedDataSource {
     cached_source = new CachedACSDataSource(source);
     Spark.get("broadband", new BroadbandHandler(cached_source));
     Spark.init();
-    Spark.awaitInitialization(); // don't continue until the server is listening
+    Spark.awaitInitialization(); /* don't continue until the server is listening */
   }
 
   @AfterEach
   public void teardown() {
-    // Gracefully stop Spark listening on both endpoints after each test
+    /* Gracefully stop Spark listening on both endpoints after each test */
     Spark.unmap("broadband");
-    Spark.awaitStop(); // don't proceed until the server is stopped
+    Spark.awaitStop(); /* don't proceed until the server is stopped */
   }
 
   private static HttpURLConnection tryRequest(String apiCall) throws IOException {
@@ -69,11 +73,10 @@ public class TestCachedDataSource {
     return clientConnection;
   }
 
+  /** This test checks that cached and non-cached match */
   @Test
   public void testCacheConsistency() throws Exception {
-    // test that checks that cached and non-cached match
-
-    // 3 variables
+    /* 3 variables */
     HttpURLConnection clientConnection1 =
         tryRequest("broadband?County=Napa%20County&State=California&ACSVariable=S2802_C03_022E");
     assertEquals(200, clientConnection1.getResponseCode());
@@ -84,7 +87,7 @@ public class TestCachedDataSource {
         cached_source.getBroadbandPercentage("Napa County", "California", "S2802_C03_022E");
     assertEquals(response1.get("broadbandpercentage"), output1);
 
-    // 2 variables
+    /* 2 variables */
     HttpURLConnection clientConnection2 =
         tryRequest("broadband?County=Orange%20County&State=California");
     assertEquals(200, clientConnection2.getResponseCode());
@@ -93,12 +96,13 @@ public class TestCachedDataSource {
     assertEquals("success", response2.get("result"));
     String output2 = cached_source.getBroadbandPercentage("Orange County", "California");
     assertEquals(response2.get("broadbandpercentage"), output2);
-    //     System.out.println("OUTPUT=" +output1);
   }
 
+  /**
+   * This test checks that the cache's stats keeps track of the number of hits and misses correctly
+   */
   @Test
   public void testCacheHitMissStats() throws Exception {
-    // checks that cache is keeping track of data already stored vs new data
     String output1 =
         cached_source.getBroadbandPercentage("Napa County", "California", "S2802_C03_022E");
     assertEquals(1, cached_source.getCacheMissCount());
@@ -109,12 +113,12 @@ public class TestCachedDataSource {
     String output3 =
         cached_source.getBroadbandPercentage("Orange County", "California", "S2802_C03_022E");
     assertEquals(2, cached_source.getCacheMissCount());
-    //     System.out.println("OUTPUT=" +output1);
   }
 
+  /** This test checks that the cache's stats keeps track of the number of loads correctly */
   @Test
   public void testCacheLoadStats() throws Exception {
-    // checks that cache is keeping track of how many times it loads data
+    /** This test checks that cache is keeping track of how many times it loads data * */
     String output1 =
         cached_source.getBroadbandPercentage("Napa County", "California", "S2802_C03_022E");
     assertEquals(1, cached_source.getCacheLoadCount());
@@ -127,11 +131,12 @@ public class TestCachedDataSource {
     assertEquals(3, cached_source.getCacheLoadCount());
   }
 
+  /**
+   * This test checks that the cache is evicting data correctly based on max num inputs (which is 3
+   * as set in CachedACSDataSource class
+   */
   @Test
   public void testCacheEvictionStats() throws Exception {
-    // checks that cache is evicting once inputs exceed maximum size (=3 as set in
-    // CachedACSDataSource class)
-
     String output1 =
         cached_source.getBroadbandPercentage("Napa County", "California", "S2802_C03_022E");
     String output2 =
