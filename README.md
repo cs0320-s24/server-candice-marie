@@ -19,12 +19,12 @@ The `CensusDataSource` interface is implemented through `ACSCensusDataSource` an
 We performed unit tests for each of the classes mentioned in Design Choices, except for the handler class. We perform integration testing with mocked data source for all handler classes.
 
 # How to
-To start the server,
+### To start the server,
 ```angular2html
 mvn package
 ./run
 ```
-To send http request to server,
+### To send http request to server,
 - Load, view, search:
   - All CSV file can only be viewed/searched after it is loaded. 
 ```angular2html
@@ -32,7 +32,7 @@ http://localhost:3232/loadcsv?path=<path under data/>
 http://localhost:3232/viewcsv
 http://localhost:3232/searchcsv?query=<query>
 ```
-- Notes on query syntax:
+#### Notes on query syntax:
   - Basic Syntax of a query:
     <colIdentifier>,<searchKey(s)>;
     - 'and', 'or', and 'not' can be used in searchKey area. Corresponding symbols are
@@ -57,7 +57,7 @@ http://localhost:3232/searchcsv?query=<query>
           `2,^5`
         - The column at index 2 does not contain the value ‘5’ and does not contain 7<br/>
           `2,^5&^7`
-To get data from United States Census Api,
+### To get data from United States Census Api,
 ```angular2html
 ....
 ```
