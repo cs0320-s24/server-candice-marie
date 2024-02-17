@@ -23,7 +23,7 @@ public class LoadCSVHandler implements Route {
    */
   public LoadCSVHandler(AccessCSV accessCSV) {
     this.accessCSV = accessCSV;
-    // Create a JSON adapter for the Map type
+    /* Create a JSON adapter for the Map type */
     Type type = Types.newParameterizedType(Map.class, String.class, Object.class);
     Moshi moshi = new Moshi.Builder().build();
     adapter = moshi.adapter(type);

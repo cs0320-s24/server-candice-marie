@@ -71,7 +71,7 @@ public class AccessCSV {
     List<String> containQueries = new ArrayList<>();
     List<String> excludeQueries = new ArrayList<>();
 
-    // put queries in categoties
+    // put queries in categories
     for (String query : queries) {
       if (query.contains("^")) {
         excludeQueries.add(query);

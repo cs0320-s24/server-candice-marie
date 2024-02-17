@@ -2,49 +2,43 @@ package edu.brown.cs.student.main.broadband;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
-import com.google.common.cache.CacheStats;
 import com.google.common.cache.LoadingCache;
 import edu.brown.cs.student.main.broadband.exceptions.InputNotFoundException;
 import java.util.concurrent.TimeUnit;
 
+/** The CachedACSDataSource class provides caching functionality for an ACSCensusDataSource. */
 public class CachedACSDataSource implements CensusDataSource {
 
   private final ACSCensusDataSource wrappedACSCensusDataSource;
   private final LoadingCache<String, String> cache;
-  public CacheStats cache_stats;
 
+  /**
+   * Construct a new CachedACSDataSource with the specified ACSCensusDataSource to wrap.
+   *
+   * @param toWrap The ACSCensusDataSource to wrap.
+   */
   public CachedACSDataSource(ACSCensusDataSource toWrap) {
     this.wrappedACSCensusDataSource = toWrap;
 
     this.cache =
         CacheBuilder.newBuilder()
-            // Using the expireAfterWrite and maximumSize methods to configure the cache,
-            // and documenting how the developer is able to change these parameters is sufficient
-            // to fulfill this spec: https://edstem.org/us/courses/54377/discussion/4348144
-
-            // How many entries maximum in the cache?
+            /* Developer can decide/change how many entries are stored in the cache */
             .maximumSize(3)
-            // How long should entries remain in the cache?
+            /* Developer can decide/change how long information is stored in the cache */
             .expireAfterWrite(1, TimeUnit.MINUTES)
-            // Keep statistical info around for profiling purposes
-
+            /* Keep statistical info around for profiling purposes */
             .recordStats()
             .build(
-                // Strategy pattern: how should the cache behave when
-                // it's asked for something it doesn't have?
                 new CacheLoader<>() {
                   @Override
                   public String load(String key) {
-                    System.out.println("called load for: " + key);
-                    // If this isn't yet present in the cache, load it:
+                    /* If this data isn't yet present in the cache, load it: */
                     String[] split_params = key.split(",");
+                    /* check number of parameters (2 or 3) to call correct getBroadbandPercentage method */
                     if (split_params.length == 2) {
                       String countyname = split_params[0];
                       String statename = split_params[1];
-                      //                  Map<String,String> =Collections.unmodifiableMap()
                       try {
-                        // return wrappedACSCensusDataSource.getBroadbandPercentage(countyname,
-                        // statename);
                         String out =
                             wrappedACSCensusDataSource.getBroadbandPercentage(
                                 countyname, statename);
@@ -52,7 +46,6 @@ public class CachedACSDataSource implements CensusDataSource {
                       } catch (Exception e) {
                         throw new InputNotFoundException(
                             "The input you entered (" + countyname + ", " + statename);
-                        // return "";//TODO: may need error handling?
                       }
                     } else {
                       String countyname = split_params[0];
@@ -77,42 +70,71 @@ public class CachedACSDataSource implements CensusDataSource {
                 });
   }
 
+  /**
+   * Retrieves the broadband percentage for a specific county and state by caching.
+   *
+   * @param countyname The name of the county.
+   * @param statename The name of the state.
+   * @return The broadband percentage as a String.
+   */
   @Override
   public String getBroadbandPercentage(String countyname, String statename) {
-    // String public_broadband = Collections.unmodifiable
     String target = countyname + "," + statename;
-    System.out.println(target);
     String result = cache.getUnchecked(target);
-    // For debugging and demo (would remove in a "real" version):
-    System.out.println(cache.stats());
     return result;
   }
 
+  /**
+   * Retrieves the broadband percentage for a specific county, state, and ACS variable, using
+   * caching.
+   *
+   * @param countyname The name of the county.
+   * @param statename The name of the state.
+   * @param acsvariable The ACS variable to consider.
+   * @return The broadband percentage as a String.
+   */
   @Override
   public String getBroadbandPercentage(String countyname, String statename, String acsvariable) {
-    // String public_broadband = Collections.unmodifiable
     String target = countyname + "," + statename + "," + acsvariable;
     String result = cache.getUnchecked(target);
-    // For debugging and demo (would remove in a "real" version):
-    System.out.println(cache.stats());
     return result;
   }
 
+  /**
+   * Retrieves the cache hit count.
+   *
+   * @return The cache hit count as an int.
+   */
   public int getCacheHitCount() {
     int hitcount = (int) cache.stats().hitCount();
     return hitcount;
   }
 
+  /**
+   * Retrieves the cache miss count.
+   *
+   * @return The cache miss count as an int.
+   */
   public int getCacheMissCount() {
     int misscount = (int) cache.stats().missCount();
     return misscount;
   }
 
+  /**
+   * Retrieves the cache load count.
+   *
+   * @return The cache load count as an int.
+   */
   public int getCacheLoadCount() {
     int loadcount = (int) cache.stats().loadCount();
     return loadcount;
   }
 
+  /**
+   * Retrieves the cache eviction count.
+   *
+   * @return The cache eviction count.
+   */
   public int getCacheEvictionCount() {
     int evictioncount = (int) cache.stats().evictionCount();
     return evictioncount;

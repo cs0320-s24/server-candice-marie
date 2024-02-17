@@ -29,18 +29,6 @@ public class Server {
       e.printStackTrace();
     }
     CachedACSDataSource cached_source = new CachedACSDataSource(source);
-    //    CachedACSDataSource cached_source = new CachedACSDataSource(new ACSCensusDataSource());
-    //    try {
-    //      source.getStateCode();
-    //      source.getCountyCode("06");
-    //    } catch(DataSourceException e) {
-    //      e.printStackTrace();
-    //    }
-    //    try {
-    //      source.getBroadbandPercentage("Stone County", "Arkansas");
-    //    } catch(DataSourceException | InputNotFoundException | DataNotFoundException e) {
-    //      e.printStackTrace();
-    //    }
 
     Spark.get("broadband", new BroadbandHandler(cached_source));
 
@@ -50,6 +38,3 @@ public class Server {
     System.out.println("Server started at http://localhost:" + port);
   }
 }
-
-// https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:137&in=state:05
-// https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:031&in=state:06

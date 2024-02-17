@@ -13,16 +13,18 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
-/**
- * BroadbandHandler
- *
- * @p
- */
+/** This class implements a Spark Route for handling data requests from the broadband endpoint. */
 public class BroadbandHandler implements Route {
 
   private final CensusDataSource state;
   private final JsonAdapter<Map<String, Object>> adapter;
 
+  /**
+   * Constructs a new BroadbandHandler with the specified CensusDataSource type and initializes a
+   * JSON adapter for converting search results and other response data into JSON format.
+   *
+   * @param state The CensusDataSource to use for retrieving broadband data.
+   */
   public BroadbandHandler(CensusDataSource state) {
     this.state = state;
     Type type = Types.newParameterizedType(Map.class, String.class, Object.class);
@@ -30,18 +32,24 @@ public class BroadbandHandler implements Route {
     adapter = moshi.adapter(type);
   }
 
+  /**
+   * Handles the HTTP request to retrieve broadband data. The request is expected to contain query
+   * parameters for the county name, statename, and ACS variable(s) (optional) Responds with a JSON
+   * object indicating the result and the output.
+   *
+   * @param request The HTTP request object.
+   * @param response The HTTP response object.
+   * @return The JSON string representation of the response.
+   */
   @Override
   public Object handle(Request request, Response response) {
     Set<String> parameters = request.queryParams();
-    System.out.println("params=" + parameters);
     Map<String, Object> responsemap = new HashMap<>();
     String countyname = request.queryParams("County");
     String statename = request.queryParams("State");
     String variablename = request.queryParams("ACSVariable");
-    System.out.println("county=" + countyname);
-    System.out.println("state=" + statename);
-    System.out.println("vars=" + variablename);
 
+    /* Checks that the input variables are not null*/
     if (countyname == null & statename == null) {
       responsemap.put("result", "Exception");
       responsemap.put("error", "county name and state name not provided");
@@ -60,6 +68,7 @@ public class BroadbandHandler implements Route {
       String responseMapString = adapter.toJson(responsemap);
       return responseMapString;
     }
+    /* If variable name is null, assume that user wants to retrieve broadband percentage */
     if (variablename == null) {
       try {
         String broadbandpercentage = state.getBroadbandPercentage(countyname, statename);
@@ -77,12 +86,11 @@ public class BroadbandHandler implements Route {
       String responseMapString = adapter.toJson(responsemap);
       return responseMapString;
     }
+
+    /* If there are multiple ACSVariable inputs, create a list of the variables */
     String[] acsvariable_list = variablename.split(",");
-    System.out.println(acsvariable_list);
     if (!variablename.equals("S2802_C03_022E")) {
-      System.out.println("varibale not equal to broadband");
       if (acsvariable_list.length == 1) {
-        System.out.println("only one var");
         try {
           String broadbandpercentage =
               state.getBroadbandPercentage(countyname, statename, variablename);
@@ -100,7 +108,7 @@ public class BroadbandHandler implements Route {
         String responseMapString = adapter.toJson(responsemap);
         return responseMapString;
       } else {
-        System.out.println("multiple vars");
+        /* Enter loop if there are multiple inputs for variable name */
         for (String s : acsvariable_list) {
           try {
             String broadbandpercentage = state.getBroadbandPercentage(countyname, statename, s);
@@ -120,11 +128,16 @@ public class BroadbandHandler implements Route {
         return responseMapString;
       }
     } else {
+
+      /* If variable is equal to broadband percentage, result should label output with
+       * "broadband percentage:"
+       * */
+
       try {
         String broadbandpercentage =
             state.getBroadbandPercentage(countyname, statename, variablename);
         responsemap.put("result", "success");
-        responsemap.put("broadbandpercentage", broadbandpercentage);
+        responsemap.put("broadband percentage", broadbandpercentage);
         responsemap.put("county name", countyname);
         responsemap.put("state name", statename);
         String localdatetime = LocalDateTime.now().toString();
