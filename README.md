@@ -59,6 +59,18 @@ http://localhost:3232/searchcsv?query=<query>
           `2,^5&^7`
 ### To get data from United States Census Api,
 ```angular2html
-....
+http://localhost:3232/broadband?County=<County Name>&State=<State Name>
+http://localhost:3232/broadband?County=<County Name>&State=<State Name>&ACSVariable=<variable list>
 ```
-
+#### Notes on query syntax:
+- Basic Syntax of a broadband query:
+    - If searching for multiple variables, separate variables with ","
+    - If variable query parameter is left blank, default variable (S2802_C03_022E = broadband percentage) will be used 
+    - Query examples:
+        - County name is San Francisco and state name is California
+          `County=San Francisco&State=California`
+        - County name is San Francisco and state name is California, ACS variable is S2603_C07_076E
+          `County=San Francisco&State=California&ACSVariable=S2603_C07_076E`
+        - - County name is San Francisco and state name is California, ACS variables are DP02_0126E, DP02PR_0017PE
+            `County=San Francisco&State=California&ACSVariable=DP02_0126E,DP02PR_0017PE`
+        
