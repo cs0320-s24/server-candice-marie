@@ -137,7 +137,7 @@ public class BroadbandHandler implements Route {
         String broadbandpercentage =
             state.getBroadbandPercentage(countyname, statename, variablename);
         responsemap.put("result", "success");
-        responsemap.put("broadband percentage", broadbandpercentage);
+        responsemap.put("broadbandpercentage", broadbandpercentage);
         responsemap.put("county name", countyname);
         responsemap.put("state name", statename);
         String localdatetime = LocalDateTime.now().toString();
